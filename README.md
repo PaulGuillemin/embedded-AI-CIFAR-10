@@ -15,14 +15,11 @@
 1. [Analyse du modèle existant](#1-analyse-du-modèle-existant)
 2. [Étude du microcontrôleur cible](#2-étude-du-microcontrôleur-cible)
 3. [Évaluation de l’embarquabilité du modèle initial](#3-évaluation-de-lembarquabilité-du-modèle-initial)
-4. [Conception d’un nouveau modèle](#4-conception-dun-nouveau-modèle)
-5. [Conversion du modèle pour la cible embarquée](#5-conversion-du-modèle-pour-la-cible-embarquée)
-6. [Sélection d’un nouveau microcontrôleur](#6-sélection-dun-nouveau-microcontrôleur)
-7. [Intégration dans un projet embarqué](#7-intégration-dans-un-projet-embarqué)
-8. [Évaluation](#8-évaluation)
-9. [Arborescence du dépôt](#arborescence-du-dépôt)
-10. [Reproduire les résultats](#reproduire-les-résultats)
-11. [Limites & pistes](#limites--pistes)
+4. [Conception et implémentation de nouveaux modèles plus optimisés](#4-conception-et-implementation-de-nouveaux-modelès-plus-optimisés)
+5. [Sélection d’un nouveau microcontrôleur](#5-sélection-dun-nouveau-microcontrôleur)
+6. [Arborescence du dépôt](#arborescence-du-dépôt)
+7. [Reproduire les résultats](#reproduire-les-résultats)
+8. [Limites & pistes](#limites--pistes)
 
 ## 1. Analyse du modèle existant
 
@@ -130,7 +127,22 @@ Il va donc falloir analyser l'embarquabilité du modèle sur la carte selon les 
 
 ## 3. Évaluation de l’embarquabilité du modèle initial
 
-
 Ainsi, sur microcontrôleur, où la mémoire et la puissance sont limitées, ce modèle est donc trop lourd. Notre travail est de conserver au maximum la précision tout en allégeant fortement le modèle pour qu’il tienne dans la mémoire disponible du microcontrôleur.
+
+## 4. Conception et implémentation de nouveaux modèles plus optimisés
+
+### 4.A. Conception et implémentation d'un 1er modèle 
+
+#### 4.A.1. Conception du modèle
+
+#### 4.A.2 Implémentation du modèle sur le MCU cible
+
+### 4.B Conception et implémentation d'un 2ème modèle
+
+#### 4.B.1. Conception du modèle
+
+#### 4.B.2 Implémentation du modèle sur le MCU cible
+
+## 5. Sélection d'un nouveau microcontrôleur
 
 
