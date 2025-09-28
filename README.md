@@ -127,7 +127,26 @@ Il va donc falloir analyser l'embarquabilité du modèle sur la carte selon les 
 
 ## 3. Évaluation de l’embarquabilité du modèle initial
 
-Ainsi, sur microcontrôleur, où la mémoire et la puissance sont limitées, ce modèle est donc trop lourd. Notre travail est de conserver au maximum la précision tout en allégeant fortement le modèle pour qu’il tienne dans la mémoire disponible du microcontrôleur.
+### 3.A. Constatation de la non-embarquabilité du modèle
+
+A présent, notre objectif est de déterminer si le modèle est embarquable dans le microcontrôleur. Pour cela, nous avons utilisé l'extension CubeIA de CubeIDE pour implémenter le modèle sur la carte. Cette extension a commencé par analyser le modèle afin de déterminer s'il est embarquable ou non pour notre carte. Celui-ce a donc généré un rapport d'analyse dont voici un extrait ci-dessous :
+
+![Analyse par CubeIA du modèle d'IA](1.png)
+
+Egalement, voici les caractéristiques globales de stockage du modèle sur le microcontrôleur :
+
+- **Flash :** 5.12 Mo / 2 Mo
+- **RAM :** 148.56 ko / 192 ko
+
+On observe clairement que le modèle est beaucoup trop volumineux pour le microcontrôleur. Le modèle dépasse de 256% la taille de la flash de la carte. Pour ce qui est de la RAM, le modèle semble plutôt adapté. Cependant, il prend à lui seul 77.38% de la RAM du microcontrôleur ce qui est beaucoup. Notre objectif va alors être de trouver des solutions pour optimiser le modèle afin qu'il utilise moins de place dans le microcontrôleur mais, sans que le modèle ne perde trop en précision. Ce modèle ne peut donc pas être déployé dans le microcontrôleur pour des raisons de taille trop importante prise dans la mémoire du MCU.
+
+### 3.B. Analyse des ressources prises par le modèle
+
+D'après l'analyse précédente, on observe que les 2 couches qui prennent le plus de place dans la Flash du MCU sont les 2 premières couches Denses (2 premières couches "Fully Connected"). En effet, à elles seules, elles représentent 82% de la taille du modèle. 
+
+Egalement, on observe que plus il y a un nombre important de masques convolutifs sur une même couche, plus la taille prise par la couche va être importante. En effet, la dernière couche convolutive avec 128 paramètres a une taille 168 fois plus importante que la première couche convolutive avec 16 paramètres. Cette dernière couche convolutive représente également à elle seule 11.5% de la taille totale du modèle.
+
+Que ça soit pour les couches Fully Connected ou les couches convolutives, l'ajout de chaque couche a un impact important sur la taille prise par le modèle final. Ainsi, il est important de s'interroger sur la pertinance de la présence de l'ensemble des couches pour pouvoir en supprimer afin de diminuer la taille du modèle.
 
 ## 4. Conception et implémentation de nouveaux modèles plus optimisés
 
