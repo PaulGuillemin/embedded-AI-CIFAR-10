@@ -115,8 +115,22 @@ On en conclut alors que notre modèle d'IA est bien adapté pour la classificati
 
 ## 2. Étude du microcontrôleur cible
 
+Maintenant que nous avons pu analyser le modèle d'IA de classification des images de la banque CIFAR-10, notre objectif va être de déterminer son embarquabilité dans la carte choisie au départ.
+
+Tout d'abord, nous avons choisis d'utiliser la carte STM32L4R9 Discovery Kit qui possède les caractéristiques techniques suivantes :
+
+- **MCU :** STM32L4R9AII6
+- **Performances :** 120 MHz/150 DMIPS
+- **Taille Flash :** 2 Mo
+- **Taille SRAM :** 640 ko
+
+Afin de pouvoir embarqué le modèle d'IA sur cette carte, il nous faut prendre en compte des considérations techniques importantes qui sont la taille de la mémoire Flash et de la SRAM de la carte par rapport à la taille du modèle à embarquer et également la performance du MCU pour qu'il soit suffisamment performant pour exécuter le modèle d'IA. En effet, dans le processus d'implémentation du modèle d'IA dans la carte, l'ensemble des poids et la structure de l'ensemble du modèle vont être stockés dans la mémoire Flash de la carte tandis que les entrées/sorties du modèle, les activations intermédiaires et les variables temporaires vont être stockés dans la SRAM. Cependant, il faut également prendre en compte le fait que le modèle d'IA ne doit prendre toute la place de la mémoire de la carte. En effet, il faut pouvoir garder de la place en mémoire pour laisser l'utilisateur construire les différents programmes nécessaires à l'utilisation du modèle d'IA ou autres.
+
+Il va donc falloir analyser l'embarquabilité du modèle sur la carte selon les différents critères que l'on a donnés.
+
+## 3. Évaluation de l’embarquabilité du modèle initial
 
 
-Sur microcontrôleur, où la mémoire et la puissance sont limitées, ce modèle est donc trop lourd. Notre travail est de conserver au maximum la précision tout en allégeant fortement le modèle pour qu’il tienne dans la mémoire disponible du microcontrôleur.
+Ainsi, sur microcontrôleur, où la mémoire et la puissance sont limitées, ce modèle est donc trop lourd. Notre travail est de conserver au maximum la précision tout en allégeant fortement le modèle pour qu’il tienne dans la mémoire disponible du microcontrôleur.
 
 
