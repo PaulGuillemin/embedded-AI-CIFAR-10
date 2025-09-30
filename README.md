@@ -40,6 +40,8 @@ La banque d'images CIFAR-10 contient, comme son nom nous l'indique, 10 classes d
 8. Bateau
 9. Camion
 
+![Illustration de la banque d'images CIFAR-10](images/cifar10.png)
+
 Le modèle d'IA que nous allons analyser aura donc pour objectif de classer les différentes images de la banque CIFAR-10 suffisamment précisément parmi les 10 classes énoncées juste ci-dessus.  
 
 ### 1.B. Présentation du modèle d'IA
@@ -60,15 +62,13 @@ Voici les caractéristiques du modèle d'IA initial :
 Le modèle d'IA est un CNN, modèle particulièrement adapté à la reconnaissance d'images. En effet, il prend en entrée, une seule image. Chaque image en entrée du modèle d'IA correspond à un tableau de 3 matrices pour les couleurs RGB et chacune des matrices est de taille 32x32 du nombre de pixels présent dans chaque image. Dans un premier temps, l'objectif, pour le modèle d'IA, est de transformer l'image d'entrée pour pouvoir faire ressortir ses caractéristiques (convolution). Celles-ci permettront alors, dans un second temps, au modèle d'IA, de comparer l'ensemble des caractéristiques de l'image aux caractéristiques des images des différentes classes. Le modèle produira établira alors les probabilités de ressemblances pour chacune des classes ce qui nous amènera à conclure de la classification faite par le modèle.
 organisé de la manière suivante :
 
-[Entrée : Image-(32x32x3)]  
-↓  
-[6 Couches convolutives]   
-↓  
-[1 Couche de vectorisation 1D]    
-↓  
-[3 Couches Fully Connected]    
-↓  
-[Sortie :Prédiction]   
+```mermaid
+flowchart TD
+    A[Entrée : Image (32×32×3)] --> B[6 Couches Convolutives]
+    B --> C[Couche de Vectorisation (1D)]
+    C --> D[3 Couches Fully Connected]
+    D --> E[Sortie : Prédiction]
+```
 
 Cette organisation va lui permettre de classifier les images en entrée. 
 
@@ -131,7 +131,7 @@ Il va donc falloir analyser l'embarquabilité du modèle sur la carte selon les 
 
 A présent, notre objectif est de déterminer si le modèle est embarquable dans le microcontrôleur. Pour cela, nous avons utilisé l'extension CubeIA de CubeIDE pour implémenter le modèle sur la carte. Cette extension a commencé par analyser le modèle afin de déterminer s'il est embarquable ou non pour notre carte. Celui-ce a donc généré un rapport d'analyse dont voici un extrait ci-dessous :
 
-![Analyse par CubeIA du modèle d'IA](1.png)
+![Analyse par CubeIA du modèle d'IA](images/1.png)
 
 Egalement, voici les caractéristiques globales de stockage du modèle sur le microcontrôleur :
 
