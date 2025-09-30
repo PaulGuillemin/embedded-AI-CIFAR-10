@@ -96,7 +96,7 @@ Les couches convolutives du modèle vont permettre de pouvoir faire ressortir le
 
 Le modèle d'IA possède au total 6 couches convolutives dont le nombre de masques convolutifs est multiplié par 2 toutes les 2 couches. Voici un schéma des couches convolutionnelles du modèle :
 
-AJOUT D'UN SCHEMA
+![Schéma des couches convolutionnelles du modèle](images/cnn-graph.png)
 
 #### 1.C.2. Couche de vectorisation 1D
 
