@@ -62,13 +62,15 @@ Voici les caractéristiques du modèle d'IA initial :
 Le modèle d'IA est un CNN, modèle particulièrement adapté à la reconnaissance d'images. En effet, il prend en entrée, une seule image. Chaque image en entrée du modèle d'IA correspond à un tableau de 3 matrices pour les couleurs RGB et chacune des matrices est de taille 32x32 du nombre de pixels présent dans chaque image. Dans un premier temps, l'objectif, pour le modèle d'IA, est de transformer l'image d'entrée pour pouvoir faire ressortir ses caractéristiques (convolution). Celles-ci permettront alors, dans un second temps, au modèle d'IA, de comparer l'ensemble des caractéristiques de l'image aux caractéristiques des images des différentes classes. Le modèle produira établira alors les probabilités de ressemblances pour chacune des classes ce qui nous amènera à conclure de la classification faite par le modèle.
 organisé de la manière suivante :
 
-```mermaid
-flowchart TD
-    A[Entrée : Image (32×32×3)] --> B[6 Couches Convolutives]
-    B --> C[Couche de Vectorisation (1D)]
-    C --> D[3 Couches Fully Connected]
-    D --> E[Sortie : Prédiction]
-```
+[Entrée : Image-(32x32x3)]  
+↓  
+[6 Couches convolutives]   
+↓  
+[1 Couche de vectorisation 1D]    
+↓  
+[3 Couches Fully Connected]    
+↓  
+[Sortie :Prédiction]   
 
 Cette organisation va lui permettre de classifier les images en entrée. 
 
