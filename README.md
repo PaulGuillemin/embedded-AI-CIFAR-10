@@ -170,9 +170,27 @@ En analysant les courbes de Loss et d'Accuracy, par comparaison avec le modèle 
 
 #### 4.A.2 Implémentation du modèle sur le MCU cible
 
-### 4.B Conception et implémentation d'un 2ème modèle
+### 4.B Conception et implémentation d'un 2ème modèle - Suppression de couches et neurones superflus
 
 #### 4.B.1. Conception du modèle
+
+Nous souhaitons à présent commencer l'optimisation du nouveau modèle précédent en supprimant des couches et neurones qui pourraient être superflus dans le modèle. Pour cela, nous avons analysons le nombre de paramètres par couche dans le modèle. En effet, notre objectif serait de supprimer le plus de paramètres possible ce qui limiterait la taille prise par notre modèle. 
+
+Pour commencer, nous supprimons les 2 dernières couches convolutives qui comportent chacune 128 neurones du CNN et qui représentent, à elles seules, 17.3% de la taille totale du modèle. Puis, nous faisons le choix de supprimer la premère couche "Dense" qui comporte 1024 neurones et qui représente, à elle seule, plus de 50% de la taille totale du modèle. 
+
+On souhaite entrainer ce nouveau modèle afin de le tester. Voici ses courbes de Loss et d'Accuracy :
+
+[IMAGE MODELE 2]
+
+On remarque que le modèle possède une Accuracy plus basse que le modèle précédent et qu'il n'y a pas d'overfitting, mais, que le modèle est moins efficace sur les données d'entrainement que sur les données de test. Pour régler ces paramètres, nous allons modifier en diminuant les valeurs de probabilité dans les couches de "Dropout" afin qu'il y ait moins de neurones éteint aléatoirement pendant l'entrainement. Ceci va alors permettre au modèle de mieux apprendre sur les données d'entrainement car il aura plus de neurones actifs disponibles et donc, d'améliorer son Accuracy globale. Nous avons fixé l'ensemble des probabilités des couches "Dropout" à 0.2 qui est la valeur la plus optimale pour l'apprentissage de notre modèle. En effet, nous avons réalisé de nombreux entrainements et les résultats les élevés se sont produits pour cette valeur-ci.
+
+On souhaite entrainer ce nouveau modèle afin de le tester. Voici ses courbes de Loss et d'Accuracy :
+
+[IMAGE MODELE 2-1]
+
+On remarque que l'Accuracy du modèle a augmenté de 77% à 79% donc, très proche de l'Accuracy initial qui était de 80%. On remarque également qu'il n'y a pas d'overfitting et que le modèle a bien atteint son point optimal d'apprentissage. La méthode de correction par variation du taux de Dropout a bien fonctionné.
+
+Maintenant que nous avons supprimé des couches du modèle, nous allons supprimer des neurones aux couches restantes. Nous commençons par réduire le nombre de neurones de la première des 2 couches Denses restantes de 512 à 256 neurones afin de diviser par 4 le nombre de paramètres vectorisés provenant des couches convolutives. Les couches Dense sont très lourdes en nombre de paramètres ce qui explique nous en supprimons des neurones. De plus, nous divisons par 
 
 #### 4.B.2 Implémentation du modèle sur le MCU cible
 
