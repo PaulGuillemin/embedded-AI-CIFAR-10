@@ -150,11 +150,19 @@ Egalement, on observe que plus il y a un nombre important de masques convolutifs
 
 Que ça soit pour les couches Fully Connected ou les couches convolutives, l'ajout de chaque couche a un impact important sur la taille prise par le modèle final. Ainsi, il est important de s'interroger sur la pertinance de la présence de l'ensemble des couches pour pouvoir en supprimer afin de diminuer la taille du modèle.
 
-## 4. Conception et implémentation de nouveaux modèles plus optimisés
+![Courbes de Loss et d'Accuracy du modèle de base](images/Loss_accuracy_courbe_modele_base.png)
+
+## 4. Conception et implémentation de nouveaux modèles plus optimisés - Remplacement de la couche Flatten
 
 ### 4.A. Conception et implémentation d'un 1er modèle 
 
 #### 4.A.1. Conception du modèle
+
+Pour réaliser la première optimisation du modèle de base, nous avons choisi de commencer par le remplacement de la couche "Flatten" par la couche "GlobalAveragePooling2D". "Flatten" correspond à la couche de vectorisation 1D que l'on a décrit précédemment. Cette couche aligne l'ensemble des données et paramètres de chaque image dans un vecteur 1D. Dans le cas du modèle de base, le set d'images entrants dans la couche "Flatten" a pour taille (2,2,128) ce qui va provoquer un vecteur de sortie de taille 512. Le nombre de poids va alors être multiplié par le nombre de neurones dans chaque couche ce qui va entrainer une large augmentation de la mémoire RAM et de la mémoire Flash. 
+
+La couche "GlobalAveragePooling2D", pour sa part, utilise une autre méthode de vectorisation des données. En effet, cette couche va réaliser la moyenne de l'ensemble des valeurs des pixels d'une image et générer, en sortie, une valeur moyenne par image. Ainsi, appliqué au modèle de base, cette couche recevrait un set d'images de taille (2,2,128) et générerait, en sortie, une vecteur 1D de taille 128. On obtient alors 128 paramètres en sortie de cette couche. Grâce à l'optimisation de la couche "Flatten" par remplacement de la couche "GlobalAveragePooling2D", on a divisé par 4 le nombre de paramètres entrant dans la partie "Fully connected" du CNN ce qui a pour conséquence une diminution de 29.1% de la taille du modèle dans la Flash. Le nouveau modèle a donc une taille de 3.63 Mo en Flash et une précision de 83.13%.
+
+Voici les courbes de Loss et d'Accuracy associé aux entrainements et aux tests du modèle ainsi optimisé :
 
 #### 4.A.2 Implémentation du modèle sur le MCU cible
 
