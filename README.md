@@ -152,9 +152,9 @@ Que ça soit pour les couches Fully Connected ou les couches convolutives, l'ajo
 
 ![Courbes de Loss et d'Accuracy du modèle de base](images/Loss_accuracy_courbe_modele_base.png)
 
-## 4. Conception et implémentation de nouveaux modèles plus optimisés - Remplacement de la couche Flatten
+## 4. Conception et implémentation de nouveaux modèles plus optimisés
 
-### 4.A. Conception et implémentation d'un 1er modèle 
+### 4.A. Conception et implémentation d'un 1er modèle - Remplacement de la couche Flatten
 
 #### 4.A.1. Conception du modèle
 
@@ -163,6 +163,10 @@ Pour réaliser la première optimisation du modèle de base, nous avons choisi d
 La couche "GlobalAveragePooling2D", pour sa part, utilise une autre méthode de vectorisation des données. En effet, cette couche va réaliser la moyenne de l'ensemble des valeurs des pixels d'une image et générer, en sortie, une valeur moyenne par image. Ainsi, appliqué au modèle de base, cette couche recevrait un set d'images de taille (2,2,128) et générerait, en sortie, une vecteur 1D de taille 128. On obtient alors 128 paramètres en sortie de cette couche. Grâce à l'optimisation de la couche "Flatten" par remplacement de la couche "GlobalAveragePooling2D", on a divisé par 4 le nombre de paramètres entrant dans la partie "Fully connected" du CNN ce qui a pour conséquence une diminution de 29.1% de la taille du modèle dans la Flash. Le nouveau modèle a donc une taille de 3.63 Mo en Flash et une précision de 83.13%.
 
 Voici les courbes de Loss et d'Accuracy associé aux entrainements et aux tests du modèle ainsi optimisé :
+
+![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_1.png)
+
+En analysant les courbes de Loss et d'Accuracy, par comparaison avec le modèle de base, on remarque que la nouvelle couche "GlobalAveragePooling2D" permet de rendre le modèle plus résistant face à l'overfitting (ce nouveau modèle n'a plus d'overfitting tandis que le modèle de base en a). Egalement, cette couche tend à améliorer l'Accuracy du modèle puisqu'elle est à plus de 83%. Cette première optimisation est donc validée.
 
 #### 4.A.2 Implémentation du modèle sur le MCU cible
 
