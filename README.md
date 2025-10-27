@@ -235,7 +235,7 @@ On remarque que le modèle possède une Accuracy (de 77%) plus basse que le mod�
 
 On remarque que la taille prise par ce nouveau modèle dans la Flash est bien moindre par rapport au précédent modèle. En effet, en supprimant des couches au modèle, on a également supprimé des neurones. En sachant que le nombre de paramètres d'entrée d'une couche va être multiplié par le nombre de neurones présents (car chacun des neurones reçoit l'ensemble des paramètres à leur entrée), cela augmente considérablement le nombre de paramètres total présent dans le modèle. En supprimant des couches et, par conséquent, des neurones, on réduit considérablement le nombre de paramètres stockés dans la mémoire Flash. On remarque que l'on a diminué la mémoire RAM de 2.78 Ko et que le temps d'entrainement a également diminué de 1-1.5 secondes par rapport au modèle précédent. Cela s'explique par la simplification du modèle que l'on produit en supprimant des couches et des neurones. Comme il y a moins de paramètres à modifier, l'entrainement est alors plus rapide.
 
-#### 4.B.1. Ajustement du Dropout pour l'entrainement (Modèle 2-1)
+#### 4.B.2. Ajustement du Dropout pour l'entrainement (Modèle 2-1)
 
 Comme on l'a vu dans les résultats du modèle précédent, le modèle ne s'entraine pas assez ce qui explique pourquoi le modèle est plus précis sur les données de validation plutôt que sur celles d'entrainement. Mais, cela signifie également que l'on peut encore gagner en précision sans modifier quelque couche ou neurone que se soit. Pour augmenter l'apprentissage du modèle, nous devons augmenter le nombre de neurones qui fournissent des résultats pendant l'entrainement. Le paramètre qui agit justement sur le nombre de neurones qui fournissent des résultats pendant l'entrainement est le Dropout. Il nous faut diminuer la valeur du Dropout.
 
@@ -263,7 +263,7 @@ On remarque que l'Accuracy du modèle a augmenté de 77% à 79% donc, très proc
 
 On remarque que faire varier la valeur du Dropout ne modifie pas la taille du modèle dans les mémoires. Cependant, durant nos différents tests de modèles, on a pu remarquer que plus la valeur du Dropout est élevée, plus le temps d'entrainement diminue. Cela découle directement du fait que le Dropout "éteint" des neurones en les mettant à 0 pendant l'entrainement ce qui diminue le nombre de paramètres et donc accélère l'entrainement. Dans notre cas, le temps d'entrainement a bien diminué, mais, très faiblement du fait de la faible variation de valeur du Dropout que nous avons appliqué.
 
-#### 4.B.1. Suppression de neurones et ajout du Pooling (Modèle 2-2)
+#### 4.B.3. Suppression de neurones et ajout du Pooling (Modèle 2-2)
 
 Maintenant que nous avons supprimé des couches du modèle, nous allons supprimer des neurones aux couches restantes. En effet, après avoir réalisé différents tests sur l'optimisation du modèle précédent, nous sommes arrivé à la conclusion que 4 couches semble être le nombre de couche idéal pour notre cas d'utilisation. Retirer plus de couches empêcherait le modèle de bien récupérer suffisamment de détails sur les images entrantes ce qui ferait diminuer la précision du modèle. Nous allons donc supprimer des neurones au modèle.
 
@@ -323,7 +323,27 @@ Nous remarquons l'apprentissage du modèle reste correct et qu'il n'y a pas d'ov
 
 ![Test du Modèle 2-2 sur MCU (100ème test)](images/accuracy_mcu_modele2-2.png)
 
-Nous avons réussi à diviser la taille en Flash du modèle précédent (modèle 2-1) par plus de 2 en supprimant des neurones aux couches existantes. Cependant, la taille en mémoire RAM prise par le modèle a un petit peu augmenté de 0.21 Ko. Egalement, l'ajout de la phase de "MaxPooling" a permis d'augmenter la vitesse d'entrainement du modèle. Il s'entrainement avec 0.5s de moins que se version précédente.
+Nous avons réussi à diviser la taille en Flash du modèle précédent (modèle 2-1) par plus de 2 en supprimant des neurones aux couches existantes. Cependant, la taille en mémoire RAM prise par le modèle a un petit peu augmenté de 0.21 Ko. Egalement, l'ajout de la phase de "MaxPooling" a permis d'augmenter la vitesse d'entrainement du modèle. Il s'entraine avec 0.5s de moins que sa version précédente.
+
+### 4.C Conception et implémentation d'un 3ème modèle - Modification du mode d'entrainement (Modèle 3 et Modèle 3-1)
+
+#### 4.C.1. Variation du Learning Rate (Modèle 3)
+
+Maintenant que nous avons supprimé des couches du modèle et ajouté une phase de "MaxPooling", nous allons continuer à supprimer des neurones aux couches restantes. Par analyse des ressources prises par chaque couche, comme les couches Dense prennent beaucoup de ressources, on a choisi de diminuer le nombre de neurones à la première couche Dense de 256 à 128. Egalement, on a choisi de diviser par 2 le nombre de neurones des 2 premières couches de convolution. Ceci aura pour effet de diminuer la taille en mémoire Flash prise par le modèle et d'augmenter la vitesse d'entrainement.
+
+Après avoir supprimé les différents neurones, nous avons réalisé différents entrainements afin de déterminer les valeurs les plus optimales du Dropout afin que l'apprentissage du modèle se réalise correctement. 
+
+Voici le nouveau schéma structurel du nouveau modèle :
+
+```mermaid
+flowchart LR
+    A["Entrée : Image (32x32x3)"] --> B["4 Couches Convolutives    Nb neurones : (16,16,32,32) -       Dropout : (/,0.1,/,0.1)    MaxPooling : (/,1,1,1)"]
+    B --> C["GlobalAveragePooling2D"]
+    C --> D["2 Couches Fully Connected    Nb neurones : (128,10) -  Dropout : (0.1,/)"]
+    D --> E["Sortie : Prédiction"]
+```
+
+
 
 ## 5. Sélection d'un nouveau microcontrôleur
 
