@@ -135,7 +135,7 @@ Cette analyse correspond au schéma du modèle de base suivant :
 
 ```mermaid
 flowchart LR
-    A["Entrée : Image (32x32x3)"] --> B["6 Couches Convolutives    Nb neurones : (32,32,64,64,128,128) Dropout : (/,0.25,/,0.25,0.25,0.25)"]
+    A["Entrée : Image (32x32x3)"] --> B["6 Couches Convolutives    Nb neurones : (32,32,64,64,128,128) Dropout : (/,0.25,/,0.25,0.25,0.25)    MaxPooling : (/,1,/,1,1,1)"]
     B --> C["Flatten"]
     C --> D["3 Couches Fully Connected    Nb neurones : (1024,512,10)            Dropout : (0.3,0.3,/)"]
     D --> E["Sortie : Prédiction"]
@@ -173,7 +173,7 @@ Voici le schéma du nouveau modèle intégrant la nouvelle couche de vectorisati
 
 ```mermaid
 flowchart LR
-    A["Entrée : Image (32x32x3)"] --> B["6 Couches Convolutives    Nb neurones : (32,32,64,64,128,128) Dropout : (/,0.25,/,0.25,0.25,0.25)"]
+    A["Entrée : Image (32x32x3)"] --> B["6 Couches Convolutives    Nb neurones : (32,32,64,64,128,128) Dropout : (/,0.25,/,0.25,0.25,0.25)    MaxPooling : (/,1,/,1,1,1)"]
     B --> C["GlobalAveragePooling2D"]
     C --> D["3 Couches Fully Connected    Nb neurones : (1024,512,10)            Dropout : (0.3,0.3,/)"]
     D --> E["Sortie : Prédiction"]
@@ -215,7 +215,7 @@ Puis, nous faisons le choix de supprimer la premère couche "Dense" qui comporte
 
 ```mermaid
 flowchart LR
-    A["Entrée : Image (32x32x3)"] --> B["4 Couches Convolutives    Nb neurones : (32,32,64,64) -       Dropout : (/,0.25,/,0.25)"]
+    A["Entrée : Image (32x32x3)"] --> B["4 Couches Convolutives    Nb neurones : (32,32,64,64) -       Dropout : (/,0.25,/,0.25)    MaxPooling : (/,1,/,1)"]
     B --> C["GlobalAveragePooling2D"]
     C --> D["2 Couches Fully Connected    Nb neurones : (512,10) -  Dropout : (0.3,/)"]
     D --> E["Sortie : Prédiction"]
@@ -243,7 +243,7 @@ Nous allons donc modifier en diminuant les valeurs de probabilité dans les couc
 
 ```mermaid
 flowchart LR
-    A["Entrée : Image (32x32x3)"] --> B["4 Couches Convolutives    Nb neurones : (32,32,64,64) -       Dropout : (/,0.2,/,0.2)"]
+    A["Entrée : Image (32x32x3)"] --> B["4 Couches Convolutives    Nb neurones : (32,32,64,64) -       Dropout : (/,0.2,/,0.2)    MaxPooling : (/,1,/,1)"]
     B --> C["GlobalAveragePooling2D"]
     C --> D["2 Couches Fully Connected    Nb neurones : (512,10) -  Dropout : (0.2,/)"]
     D --> E["Sortie : Prédiction"]
@@ -271,7 +271,7 @@ Par analyse des ressources prises par chaque couche, on a pu remarquer que les 2
 
 ```mermaid
 flowchart LR
-    A["Entrée : Image (32x32x3)"] --> B["4 Couches Convolutives    Nb neurones : (32,32,32,32) -       Dropout : (/,0.2,/,0.2)"]
+    A["Entrée : Image (32x32x3)"] --> B["4 Couches Convolutives    Nb neurones : (32,32,32,32) -       Dropout : (/,0.2,/,0.2)    MaxPooling : (/,1,/,1)"]
     B --> C["GlobalAveragePooling2D"]
     C --> D["2 Couches Fully Connected    Nb neurones : (256,10) -  Dropout : (0.2,/)"]
     D --> E["Sortie : Prédiction"]
@@ -285,7 +285,7 @@ On remarque directement que le modèle est en sous-apprentissage. En effet, le m
 
 ```mermaid
 flowchart LR
-    A["Entrée : Image (32x32x3)"] --> B["4 Couches Convolutives    Nb neurones : (32,32,32,32) -       Dropout : (/,0.15,/,0.15)"]
+    A["Entrée : Image (32x32x3)"] --> B["4 Couches Convolutives    Nb neurones : (32,32,32,32) -       Dropout : (/,0.15,/,0.15)    MaxPooling : (/,1,/,1)"]
     B --> C["GlobalAveragePooling2D"]
     C --> D["2 Couches Fully Connected    Nb neurones : (256,10) -  Dropout : (0.15,/)"]
     D --> E["Sortie : Prédiction"]
@@ -310,6 +310,10 @@ flowchart LR
     C --> D["2 Couches Fully Connected    Nb neurones : (256,10) -  Dropout : (0.15,/)"]
     D --> E["Sortie : Prédiction"]
 ```
+
+A présent, nous réentrainons notre nouveau modèle afin de visualiser l'effet de l'ajout d'une phase de MaxPooling :
+
+![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_2-2.png)
 
 ## 5. Sélection d'un nouveau microcontrôleur
 
