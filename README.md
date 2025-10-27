@@ -143,7 +143,7 @@ flowchart LR
 
 Egalement, voici les caractéristiques globales de stockage du modèle sur le microcontrôleur :
 
-| Résultats | *Flash* | *RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible* |
+| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible* |
 |-----------|---------|-------|----------------------|----------------------------------------|--------------------------------------|
 | Valeurs | 5.12Mo / 2Mo | 148.56ko / 192ko | 6-7sec | 83.7% | Non-implémentable en l'état |
 
@@ -189,7 +189,7 @@ Egalement, grâce à l'optimisation de la couche "Flatten" par remplacement de l
 
 En réalisant l'analyse de l'importation du nouveau modèle sur CubeAI adapté à notre MCU cible, les résultats montrent toujours que la taille en Flash est trop importante même si elle a diminué et la taille en RAM est correcte même si trop importante. En effet, notre modèle occupe 77.5% de la RAM totale ce qui ne laisse que peu de place à des applications utilisateurs en plus et au fonctionnement du système lui-même.
 
-| Résultats | *Flash* | *RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible* |
+| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible* |
 |-----------|---------|-------|----------------------|----------------------------------------|--------------------------------------|
 | Valeurs | 3.64Mo / 2Mo | 148.71ko / 192ko | 7sec | 83.13% | Non-implémentable en l'état |
 
@@ -227,7 +227,7 @@ On souhaite entrainer ce nouveau modèle afin de le tester pour évaluer l'impac
 
 On remarque que le modèle possède une Accuracy (de 77%) plus basse que le modèle précédent et qu'il n'y a pas d'overfitting, mais, que le modèle est moins efficace sur les données d'entrainement que sur les données de test. Egalement, on a choisit de l'intégrer sur CubeAI afin de vérifier la taille Flash et RAM que ce modèle prendrait sur le MCU cible et voici les résultats obtenus :
 
-| Résultats | *Flash* | *RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
+| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
 |-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
 |  Valeurs  | 425.8Ko / 2Mo | 145.93ko / 192ko | 5-6sec | 77.72% | 71% |
 
@@ -255,7 +255,7 @@ On souhaite maintenant entrainer ce nouveau modèle afin de vérifier que la mod
 
 On remarque que l'Accuracy du modèle a augmenté de 77% à 79% donc, très proche de l'Accuracy initial qui était de 80%. On remarque également qu'il n'y a pas d'overfitting et que le modèle a bien atteint son point optimal d'apprentissage. La méthode de correction par variation du taux de Dropout a donc bien fonctionné.
 
-| Résultats | *Flash* | *RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
+| Résultats | * MCU Flash* | *MCU RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
 |-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
 |  Valeurs  | 425.8Ko / 2Mo | 145.93ko / 192ko | 5-6sec | 79.04% | 82% |
 
@@ -301,7 +301,7 @@ Une phase de "Pooling" agit comme un compresseur de la donnée d'entrée. En eff
 
 Cette phase de "MaxPooling" permet de diminuer le nombre de paramètres à traiter au sein des couches de neurones grâce au phénomène de compression qu'elle génère. Ainsi, les ressources prises par le modèle auront tendance à diminuer et la vitesse d'entrainement sera plus également court. De plus, en ne retenant que les valeurs maximales, cela permet au modèle de ne retenir que les caractéristiques les plus importantes de l'image et d'oublier les détails non important. Ainsi, cela va permettre au modèle d'améliorer sa précision car il sera en possession de caractéristiques plus distinctives pour classer les images. Enfin, le modèle devient plus robuste aux petites translations et au bruit sur l'image. Cette phase est tout à fait bénéfique pour notre modèle.
 
-Nous faisons donc le choix d'ajouter une phase de "MaxPooling" sur la deuxièmes couche convolutive afin d'améliorer la précision du modèle. Voici alors le schéma structurel du modèle :
+Nous faisons donc le choix d'ajouter une phase de "MaxPooling" sur la deuxième couche convolutive afin d'améliorer la précision du modèle. Voici alors le schéma structurel du modèle :
 
 ```mermaid
 flowchart LR
@@ -311,17 +311,19 @@ flowchart LR
     D --> E["Sortie : Prédiction"]
 ```
 
-A présent, nous réentrainons notre nouveau modèle afin de visualiser l'effet de l'ajout d'une phase de MaxPooling :
+Nous n'avons ajouté qu'une seule phase de MaxPooling supplémentaire car, en réalisant des tests, nous avons pu constater qu'ajouter 2 phases de MaxPooling supplémentaires réduisait l'Accuracy du modèle. A présent, nous réentrainons notre nouveau modèle afin de visualiser l'effet de l'ajout d'une phase de MaxPooling :
 
 ![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_2-2.png)
 
 Nous remarquons l'apprentissage du modèle reste correct et qu'il n'y a pas d'overfitting. Egalement, on remarque que l'on a réussi à augmenter la précision du modèle de 73% à 77% soit 4% de plus. Enfin, nous implémentons ce nouveau modèle sur le MCU cible en utilisant CubeAI et voici les résultats obtenus :
 
-| Résultats | *Flash* | *RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
+| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
 |-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
-|  Valeurs  | 425.8Ko / 2Mo | 145.93ko / 192ko | 5sec | 77.01% | 76% |
+|  Valeurs  | 174.25Ko / 2Mo | 146.14ko / 192ko | 5sec | 77.01% | 76% |
 
+![Test du Modèle 2-2 sur MCU (100ème test)](images/accuracy_mcu_modele2-2.png)
 
+Nous avons réussi à diviser la taille en Flash du modèle précédent (modèle 2-1) par plus de 2 en supprimant des neurones aux couches existantes. Cependant, la taille en mémoire RAM prise par le modèle a un petit peu augmenté de 0.21 Ko. Egalement, l'ajout de la phase de "MaxPooling" a permis d'augmenter la vitesse d'entrainement du modèle. Il s'entrainement avec 0.5s de moins que se version précédente.
 
 ## 5. Sélection d'un nouveau microcontrôleur
 
