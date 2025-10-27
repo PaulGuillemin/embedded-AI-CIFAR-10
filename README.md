@@ -29,16 +29,10 @@ La première question à se poser quand on souhaite concevoir un modèle d'Intel
 
 La banque d'images CIFAR-10 contient, comme son nom nous l'indique, 10 classes d'images :  
 
-0. Avion
-1. Voiture
-2. Oiseau
-3. Chat 
-4. Cerf
-5. Chien
-6. Grenouille
-7. Cheval
-8. Bateau
-9. Camion
+| Nom de la classe | *Avion* | *Voiture* | *Oiseau* | *Chat* | *Cerf* | *Chien* | *Grenouille* | *Cheval* | *Bateau* | *Camion* |
+|------------------|-------|---------|--------|------|------|-------|------------|--------|--------|--------|
+| Numéro de la classe | *0* | *1* | *2* | *3* | *4* | *5* | *6* | *7* | *8* | *9* | 
+
 
 ![Illustration de la banque d'images CIFAR-10](images/cifar10.png)
 
@@ -62,15 +56,13 @@ Voici les caractéristiques du modèle d'IA initial :
 Le modèle d'IA est un CNN, modèle particulièrement adapté à la reconnaissance d'images. En effet, il prend en entrée, une seule image. Chaque image en entrée du modèle d'IA correspond à un tableau de 3 matrices pour les couleurs RGB et chacune des matrices est de taille 32x32 du nombre de pixels présent dans chaque image. Dans un premier temps, l'objectif, pour le modèle d'IA, est de transformer l'image d'entrée pour pouvoir faire ressortir ses caractéristiques (convolution). Celles-ci permettront alors, dans un second temps, au modèle d'IA, de comparer l'ensemble des caractéristiques de l'image aux caractéristiques des images des différentes classes. Le modèle produira établira alors les probabilités de ressemblances pour chacune des classes ce qui nous amènera à conclure de la classification faite par le modèle.
 organisé de la manière suivante :
 
-[Entrée : Image-(32x32x3)]  
-↓  
-[6 Couches convolutives]   
-↓  
-[1 Couche de vectorisation 1D]    
-↓  
-[3 Couches Fully Connected]    
-↓  
-[Sortie :Prédiction]   
+```mermaid
+flowchart LR
+    A["Entrée : Image (32x32x3)"] --> B["6 Couches Convolutives"]
+    B --> C["Couche de Vectorisation 1D"]
+    C --> D["3 Couches Fully Connected"]
+    D --> E["Sortie : Prédiction"]
+```
 
 Cette organisation va lui permettre de classifier les images en entrée. 
 
@@ -78,17 +70,21 @@ Cette organisation va lui permettre de classifier les images en entrée.
 
 Les couches convolutives du modèle vont permettre de pouvoir faire ressortir les caractéristiques de l'image en entrée. En effet, chaque couche de convolution de notre modèle est composée des éléments suivants successivement :
 
-1. n masques de convolution
-2. une fonction d'activation non-linéaire (ReLU, dans notre cas)
-3. Phase de dropout (pas sur toutes les couches)
-4. Batch-normalisation
-5. Phase de pooling (pas sur toutes les couches)
+```mermaid
+flowchart LR
+    A["Entrée : Image (nxmxp)"] --> B["N masques de convolution"]
+    B --> C["Fonction d'activation non-linéaire"]
+    C --> D["Phase de dropout (pas sur toutes les couches)"]
+    D --> E["Batch-normalisation"]
+    E --> F["Phase de pooling (pas sur toutes les couches)"]
+    F --> G["Sortie : N images (n/2xm/2xp) si pooling (nxmxp) sinon"]
+```
 
 **Masque de convolution :** Chaque couche de convolution possède un certain nombre de masques de convolution différents. Ces masques correspondent à des matrices de taille généralement 3x3 avec une profondeur de 3 matrices (pour les couleurs RGB) qui vont naviguer sur l'ensemble des pixels de l'image d'entrée. Ainsi, des produits scalaires vont être réalisés entre les valeur du masque convolutionnel et les valeurs des pixels de l'image d'entrée. De cette manière, une nouvelle image est créée dont les valeurs de chaque pixel équivaut au produit scalaires du pixel correspondant sur l'image d'entrée par la valeur de la matrice du masque convolutionnel. Ainsi, on fabrique autant de nouvelles images qu'il y a de masques convolutionnels différents sur la couche. De cette manière, les caractéristiques de l'image vont commencer à ressortir sur les nouvelles images ainsi créées. 
 
 **Fonction d'activation :** La fonction d'activation permet d'introduire de la non-linéarité dans les calculs réalisés par les neurones du réseau. Il existe plusieurs fonction d'activation, toutes non-linéaires, mais, dans notre cas, nous utilisons la fonction ReLU (Rectified Linear Unit. Cette fonction produit une sortie de 0 pour tout x∈]-∞;0] et x pour tout x∈[0;+∞[. Elle est simple à calculer donc tout à fait aux réseaux de neurones profonds. Elle permet une meilleure performance de calcul du réseau. C'est pourquoi elle est utilisée dans ce modèle.
 
-**Dropout :** La notion de Dropout n'intervient pas à chaque couche convolutionnelle. Le dropout prend en argument une probabilité. En effet, pendant l'exécution du modèle, aléatoirement, la phase de Dropout va venir mettre à 0 plusieurs neurones avec une probabilité égale à la probabilité marquée en entrée. Cette phase permet notamment d'équilibrer l'entrainement du modèle et empêcher la prépondérance de certains paramètres devant d'autres. Cette phase va donc permettre "d'éteindre" certains neurones selon une certaine probabilité afin de ne pas les prendre en compte dans la suite des calculs pour diminuer leur importance. Cela permet donc d'équilibrer l'importance de tous les paramètres et donc d'optimiser la précision du modèle d'IA.
+**Dropout :** La notion de Dropout n'intervient pas à chaque couche convolutionnelle. Le dropout prend en argument une probabilité. En effet, pendant l'exécution du modèle, aléatoirement, la phase de Dropout va venir mettre à 0 plusieurs neurones avec une probabilité égale à la probabilité marquée en entrée. Cette phase permet notamment d'équilibrer l'entrainement du modèle et empêcher la prépondérance de certains paramètres devant d'autres. Cette phase va donc permettre "d'éteindre" certains neurones selon une certaine probabilité afin de ne pas les prendre en compte dans la suite des calculs pour diminuer leur importance. Cela permet donc d'équilibrer l'importance de tous les paramètres et donc d'optimiser la précision du modèle d'IA. Cette couche est notamment très utile lorsque l'on cherche à lutter contre le surapprentissage (overfitting) ou sous-apprentissage (underfitting) du modèle.
 
 **Batch-normalisation :** Cette phase correspond à la normalisation des sorties selon des mini-batch de la couche convolutionnelle entre 0 et 1 pendant l'entraienement ce qui va permettre de stabiliser l'apprentissage du modèle et de poursuivre le travail de régularisation et d'équilibrage de l'ensemble des paramètres du modèle.
 
@@ -135,10 +131,21 @@ A présent, notre objectif est de déterminer si le modèle est embarquable dans
 
 ![Analyse par CubeIA du modèle d'IA](images/1.png)
 
+Cette analyse correspond au schéma du modèle de base suivant :
+
+```mermaid
+flowchart LR
+    A["Entrée : Image (32x32x3)"] --> B["6 Couches Convolutives    Nb neurones : (32,32,64,64,128,128) Dropout : (/,0.25,/,0.25,0.25,0.25)    MaxPooling : (/,1,/,1,1,1)"]
+    B --> C["Flatten"]
+    C --> D["3 Couches Fully Connected    Nb neurones : (1024,512,10)            Dropout : (0.3,0.3,/)"]
+    D --> E["Sortie : Prédiction"]
+```
+
 Egalement, voici les caractéristiques globales de stockage du modèle sur le microcontrôleur :
 
-- **Flash :** 5.12 Mo / 2 Mo
-- **RAM :** 148.56 ko / 192 ko
+| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible* |
+|-----------|---------|-------|----------------------|----------------------------------------|--------------------------------------|
+| Valeurs | 5.12Mo / 2Mo | 148.56ko / 192ko | 6-7sec | 83.7% | Non-implémentable en l'état |
 
 On observe clairement que le modèle est beaucoup trop volumineux pour le microcontrôleur. Le modèle dépasse de 256% la taille de la flash de la carte. Pour ce qui est de la RAM, le modèle semble plutôt adapté. Cependant, il prend à lui seul 77.38% de la RAM du microcontrôleur ce qui est beaucoup. Notre objectif va alors être de trouver des solutions pour optimiser le modèle afin qu'il utilise moins de place dans le microcontrôleur mais, sans que le modèle ne perde trop en précision. Ce modèle ne peut donc pas être déployé dans le microcontrôleur pour des raisons de taille trop importante prise dans la mémoire du MCU.
 
@@ -154,13 +161,23 @@ Que ça soit pour les couches Fully Connected ou les couches convolutives, l'ajo
 
 ## 4. Conception et implémentation de nouveaux modèles plus optimisés
 
-### 4.A. Conception et implémentation d'un 1er modèle - Remplacement de la couche Flatten
+Maintenant que nous avons pu analyser et étudier le modèle de base, nous souhaitons nous donner pour objectif d'optimiser ce modèle de base afin de diminuer sa taille Flash et RAM le plus possible en impactant le moins possible les performances d'Accuracy du modèle de base. Pour réaliser cela, nous allons détailler, dans la suite, l'ensemble des étapes et du processus de réflexion qui nous ont amené à concevoir un modèle plus optimisé que le modèle de base permettant d'être embarqué sur un microcontrôleur et d'avoir un temps d'entrainement court. 
 
-#### 4.A.1. Conception du modèle
+### 4.A. Conception et implémentation d'un 1er modèle - Remplacement de la couche Flatten (Modèle 1 et Modèle 1-1)
 
-Pour réaliser la première optimisation du modèle de base, nous avons choisi de commencer par le remplacement de la couche "Flatten" par la couche "GlobalAveragePooling2D". "Flatten" correspond à la couche de vectorisation 1D que l'on a décrit précédemment. Cette couche aligne l'ensemble des données et paramètres de chaque image dans un vecteur 1D. Dans le cas du modèle de base, le set d'images entrants dans la couche "Flatten" a pour taille (2,2,128) ce qui va provoquer un vecteur de sortie de taille 512. Le nombre de poids va alors être multiplié par le nombre de neurones dans chaque couche ce qui va entrainer une large augmentation de la mémoire RAM et de la mémoire Flash. 
+Pour réaliser la première optimisation du modèle de base, nous avons choisi de commencer par le remplacement de la couche "Flatten" par la couche "GlobalAveragePooling2D". "Flatten" correspond à la couche de vectorisation 1D que l'on a décrit précédemment. Cette couche aligne l'ensemble des données et paramètres de chaque image dans un vecteur 1D. Les données sont placées côte à côte. Dans le cas du modèle de base, le set d'images entrant dans la couche "Flatten" a pour taille (2,2,128) c'est-à-dire 128 images de taille 2x2 pixels. Il y a donc, au total, 128x2x2 = 512 paramètres à aligner dans un vecteur 1D. La couche "Flatten" va alors former un vecteur de sortie de taille 512. Le nombre de paramètres va alors être multiplié par le nombre de neurones dans chaque couche ce qui va entrainer une large augmentation de la mémoire RAM et de la mémoire Flash. Par exemple, pour la première couche "Dense" qui contient 1024 neurones, on aurait déjà 1024x512 = 524 288 paramètres. Notre objectif est donc de diminuer le nombre de paramètres propagés dans la partie "Fully Connected" du modèle.
 
-La couche "GlobalAveragePooling2D", pour sa part, utilise une autre méthode de vectorisation des données. En effet, cette couche va réaliser la moyenne de l'ensemble des valeurs des pixels d'une image et générer, en sortie, une valeur moyenne par image. Ainsi, appliqué au modèle de base, cette couche recevrait un set d'images de taille (2,2,128) et générerait, en sortie, une vecteur 1D de taille 128. On obtient alors 128 paramètres en sortie de cette couche. Grâce à l'optimisation de la couche "Flatten" par remplacement de la couche "GlobalAveragePooling2D", on a divisé par 4 le nombre de paramètres entrant dans la partie "Fully connected" du CNN ce qui a pour conséquence une diminution de 29.1% de la taille du modèle dans la Flash. Le nouveau modèle a donc une taille de 3.63 Mo en Flash et une précision de 83.13%.
+La couche "GlobalAveragePooling2D", pour sa part, utilise une autre méthode de vectorisation des données. En effet, cette couche va réaliser la moyenne de l'ensemble des valeurs des pixels d'une image et générer, en sortie, une valeur moyenne par image. Ainsi, appliqué au modèle de base, cette couche recevrait un set d'images de taille (2,2,128) et générerait, en sortie, une vecteur 1D de taille 128. En effet, le set d'images contient 128 images de 2x2 pixels chacune. La couche "GlobalAveragePooling2D" va faire une moyenne de l'ensemble des paramètres de chacune des images. Ainsi, au lieu d'aligner les 4 paramètres de chacune des images, cette couche ne va aligner qu'un seul paramètre par image correspondant à la moyenne des 4 paramètres qui constituent l'image à la base. On obtient alors un vecteur 1D de 128 paramètres en sortie de cette couche. 
+
+Voici le schéma du nouveau modèle intégrant la nouvelle couche de vectorisation 1D :
+
+```mermaid
+flowchart LR
+    A["Entrée : Image (32x32x3)"] --> B["6 Couches Convolutives    Nb neurones : (32,32,64,64,128,128) Dropout : (/,0.25,/,0.25,0.25,0.25)    MaxPooling : (/,1,/,1,1,1)"]
+    B --> C["GlobalAveragePooling2D"]
+    C --> D["3 Couches Fully Connected    Nb neurones : (1024,512,10)            Dropout : (0.3,0.3,/)"]
+    D --> E["Sortie : Prédiction"]
+```
 
 Voici les courbes de Loss et d'Accuracy associé aux entrainements et aux tests du modèle ainsi optimisé :
 
@@ -168,31 +185,173 @@ Voici les courbes de Loss et d'Accuracy associé aux entrainements et aux tests 
 
 En analysant les courbes de Loss et d'Accuracy, par comparaison avec le modèle de base, on remarque que la nouvelle couche "GlobalAveragePooling2D" permet de rendre le modèle plus résistant face à l'overfitting (ce nouveau modèle n'a plus d'overfitting tandis que le modèle de base en a). Egalement, cette couche tend à améliorer l'Accuracy du modèle puisqu'elle est à plus de 83%. Cette première optimisation est donc validée.
 
-#### 4.A.2 Implémentation du modèle sur le MCU cible
+Egalement, grâce à l'optimisation de la couche "Flatten" par remplacement de la couche "GlobalAveragePooling2D", on a divisé par 4 le nombre de paramètres entrant dans la partie "Fully connected" du CNN ce qui a pour conséquence une diminution de 29.1% de la taille du modèle dans la Flash. Le nouveau modèle a donc une taille de 3.63 Mo en Flash et une précision de 83.13%.
 
-### 4.B Conception et implémentation d'un 2ème modèle - Suppression de couches et neurones superflus
+En réalisant l'analyse de l'importation du nouveau modèle sur CubeAI adapté à notre MCU cible, les résultats montrent toujours que la taille en Flash est trop importante même si elle a diminué et la taille en RAM est correcte même si trop importante. En effet, notre modèle occupe 77.5% de la RAM totale ce qui ne laisse que peu de place à des applications utilisateurs en plus et au fonctionnement du système lui-même.
 
-#### 4.B.1. Conception du modèle
+| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible* |
+|-----------|---------|-------|----------------------|----------------------------------------|--------------------------------------|
+| Valeurs | 3.64Mo / 2Mo | 148.71ko / 192ko | 7sec | 83.13% | Non-implémentable en l'état |
+
+On a remarqué que le remplacement de la couche "Flatten" a augmenté la taille du modèle en RAM de 0.15ko et son temps d'entrainement global de 0.3-0.5 secondes. En effet, la couche "GlobalAveragePooling2D" réalisant plus de calculs en faisant les moyennes des paramètres des images que la couche "Flatten" qui ne fait qu'aligner les paramètres dans un vecteur, ceci explique ces effets. 
+
+### 4.B Conception et implémentation d'un 2ème modèle - Suppression de couches et neurones superflus (Modèle 2, Modèle 2-1 et Modèle 2-2)
+
+#### 4.B.1. Suppression de couches superflus (Modèle 2)
 
 Nous souhaitons à présent commencer l'optimisation du nouveau modèle précédent en supprimant des couches et neurones qui pourraient être superflus dans le modèle. Pour cela, nous avons analysons le nombre de paramètres par couche dans le modèle. En effet, notre objectif serait de supprimer le plus de paramètres possible ce qui limiterait la taille prise par notre modèle. 
 
-Pour commencer, nous supprimons les 2 dernières couches convolutives qui comportent chacune 128 neurones du CNN et qui représentent, à elles seules, 17.3% de la taille totale du modèle. Puis, nous faisons le choix de supprimer la premère couche "Dense" qui comporte 1024 neurones et qui représente, à elle seule, plus de 50% de la taille totale du modèle. 
+Pour commencer, nous supprimons les 2 dernières couches convolutives qui comportent chacune 128 neurones du CNN et qui représentent, à elles seules, 17.3% de la taille totale du modèle. Le schéma du modèle devient alors : 
 
-On souhaite entrainer ce nouveau modèle afin de le tester. Voici ses courbes de Loss et d'Accuracy :
+```mermaid
+flowchart LR
+    A["Entrée : Image (32x32x3)"] --> B["4 Couches Convolutives    Nb neurones : (32,32,64,64) -       Dropout : (/,0.25,/,0.25)"]
+    B --> C["GlobalAveragePooling2D"]
+    C --> D["3 Couches Fully Connected    Nb neurones : (1024,512,10)            Dropout : (0.3,0.3,/)"]
+    D --> E["Sortie : Prédiction"]
+```
 
-[IMAGE MODELE 2]
+Puis, nous faisons le choix de supprimer la premère couche "Dense" qui comporte 1024 neurones et qui représente, à elle seule, plus de 50% de la taille totale du modèle. Le schéma du modèle devient alors : 
 
-On remarque que le modèle possède une Accuracy plus basse que le modèle précédent et qu'il n'y a pas d'overfitting, mais, que le modèle est moins efficace sur les données d'entrainement que sur les données de test. Pour régler ces paramètres, nous allons modifier en diminuant les valeurs de probabilité dans les couches de "Dropout" afin qu'il y ait moins de neurones éteint aléatoirement pendant l'entrainement. Ceci va alors permettre au modèle de mieux apprendre sur les données d'entrainement car il aura plus de neurones actifs disponibles et donc, d'améliorer son Accuracy globale. Nous avons fixé l'ensemble des probabilités des couches "Dropout" à 0.2 qui est la valeur la plus optimale pour l'apprentissage de notre modèle. En effet, nous avons réalisé de nombreux entrainements et les résultats les élevés se sont produits pour cette valeur-ci.
+```mermaid
+flowchart LR
+    A["Entrée : Image (32x32x3)"] --> B["4 Couches Convolutives    Nb neurones : (32,32,64,64) -       Dropout : (/,0.25,/,0.25)    MaxPooling : (/,1,/,1)"]
+    B --> C["GlobalAveragePooling2D"]
+    C --> D["2 Couches Fully Connected    Nb neurones : (512,10) -  Dropout : (0.3,/)"]
+    D --> E["Sortie : Prédiction"]
+```
 
-On souhaite entrainer ce nouveau modèle afin de le tester. Voici ses courbes de Loss et d'Accuracy :
+On souhaite entrainer ce nouveau modèle afin de le tester pour évaluer l'impact qu'a eu la suppression de l'ensemble de ces couches et neurones. Voici les courbes de Loss et d'Accuracy de ce nouveau modèle :
 
-[IMAGE MODELE 2-1]
+![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_2.png)
 
-On remarque que l'Accuracy du modèle a augmenté de 77% à 79% donc, très proche de l'Accuracy initial qui était de 80%. On remarque également qu'il n'y a pas d'overfitting et que le modèle a bien atteint son point optimal d'apprentissage. La méthode de correction par variation du taux de Dropout a bien fonctionné.
+On remarque que le modèle possède une Accuracy (de 77%) plus basse que le modèle précédent et qu'il n'y a pas d'overfitting, mais, que le modèle est moins efficace sur les données d'entrainement que sur les données de test. Egalement, on a choisit de l'intégrer sur CubeAI afin de vérifier la taille Flash et RAM que ce modèle prendrait sur le MCU cible et voici les résultats obtenus :
 
-Maintenant que nous avons supprimé des couches du modèle, nous allons supprimer des neurones aux couches restantes. Nous commençons par réduire le nombre de neurones de la première des 2 couches Denses restantes de 512 à 256 neurones afin de diviser par 4 le nombre de paramètres vectorisés provenant des couches convolutives. Les couches Dense sont très lourdes en nombre de paramètres ce qui explique nous en supprimons des neurones. De plus, nous divisons par 
+| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
+|-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
+|  Valeurs  | 425.8Ko / 2Mo | 145.93ko / 192ko | 5-6sec | 77.72% | 71% |
 
-#### 4.B.2 Implémentation du modèle sur le MCU cible
+![Test du Modèle 2 sur MCU (100ème test)](images/accuracy_mcu_modele2.png)
+
+On remarque que la taille prise par ce nouveau modèle dans la Flash est bien moindre par rapport au précédent modèle. En effet, en supprimant des couches au modèle, on a également supprimé des neurones. En sachant que le nombre de paramètres d'entrée d'une couche va être multiplié par le nombre de neurones présents (car chacun des neurones reçoit l'ensemble des paramètres à leur entrée), cela augmente considérablement le nombre de paramètres total présent dans le modèle. En supprimant des couches et, par conséquent, des neurones, on réduit considérablement le nombre de paramètres stockés dans la mémoire Flash. On remarque que l'on a diminué la mémoire RAM de 2.78 Ko et que le temps d'entrainement a également diminué de 1-1.5 secondes par rapport au modèle précédent. Cela s'explique par la simplification du modèle que l'on produit en supprimant des couches et des neurones. Comme il y a moins de paramètres à modifier, l'entrainement est alors plus rapide.
+
+#### 4.B.2. Ajustement du Dropout pour l'entrainement (Modèle 2-1)
+
+Comme on l'a vu dans les résultats du modèle précédent, le modèle ne s'entraine pas assez ce qui explique pourquoi le modèle est plus précis sur les données de validation plutôt que sur celles d'entrainement. Mais, cela signifie également que l'on peut encore gagner en précision sans modifier quelque couche ou neurone que se soit. Pour augmenter l'apprentissage du modèle, nous devons augmenter le nombre de neurones qui fournissent des résultats pendant l'entrainement. Le paramètre qui agit justement sur le nombre de neurones qui fournissent des résultats pendant l'entrainement est le Dropout. Il nous faut diminuer la valeur du Dropout.
+
+Nous allons donc modifier en diminuant les valeurs de probabilité dans les couches de "Dropout" afin qu'il y ait moins de neurones éteint aléatoirement pendant l'entrainement. Ceci va alors permettre au modèle de mieux apprendre sur les données d'entrainement car il aura plus de neurones actifs disponibles et donc, d'améliorer son Accuracy globale. Pour ajuster les bonnes valeurs de Dropout, nous avons réalisé une bonne dizaine de tests afin d'arriver à la conclusion que l'ensemble des probabilités des couches "Dropout" doit être fixé 0.2 qui est la valeur la plus optimale pour l'apprentissage de notre modèle. Voici donc le schéma représentatif de notre modèle 2-1 :
+
+```mermaid
+flowchart LR
+    A["Entrée : Image (32x32x3)"] --> B["4 Couches Convolutives    Nb neurones : (32,32,64,64) -       Dropout : (/,0.2,/,0.2)    MaxPooling : (/,1,/,1)"]
+    B --> C["GlobalAveragePooling2D"]
+    C --> D["2 Couches Fully Connected    Nb neurones : (512,10) -  Dropout : (0.2,/)"]
+    D --> E["Sortie : Prédiction"]
+```
+
+On souhaite maintenant entrainer ce nouveau modèle afin de vérifier que la modification de la valeur des Dropout a bien corriger le sous-apprentissage. Voici les courbes de Loss et d'Accuracy obtenues :
+
+![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_2-1.png)
+
+On remarque que l'Accuracy du modèle a augmenté de 77% à 79% donc, très proche de l'Accuracy initial qui était de 80%. On remarque également qu'il n'y a pas d'overfitting et que le modèle a bien atteint son point optimal d'apprentissage. La méthode de correction par variation du taux de Dropout a donc bien fonctionné.
+
+| Résultats | * MCU Flash* | *MCU RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
+|-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
+|  Valeurs  | 425.8Ko / 2Mo | 145.93ko / 192ko | 5-6sec | 79.04% | 82% |
+
+![Test du Modèle 2-1 sur MCU (100ème test)](images/accuracy_mcu_modele2-1.png)
+
+On remarque que faire varier la valeur du Dropout ne modifie pas la taille du modèle dans les mémoires. Cependant, durant nos différents tests de modèles, on a pu remarquer que plus la valeur du Dropout est élevée, plus le temps d'entrainement diminue. Cela découle directement du fait que le Dropout "éteint" des neurones en les mettant à 0 pendant l'entrainement ce qui diminue le nombre de paramètres et donc accélère l'entrainement. Dans notre cas, le temps d'entrainement a bien diminué, mais, très faiblement du fait de la faible variation de valeur du Dropout que nous avons appliqué.
+
+#### 4.B.3. Suppression de neurones et ajout du Pooling (Modèle 2-2)
+
+Maintenant que nous avons supprimé des couches du modèle, nous allons supprimer des neurones aux couches restantes. En effet, après avoir réalisé différents tests sur l'optimisation du modèle précédent, nous sommes arrivé à la conclusion que 4 couches semble être le nombre de couche idéal pour notre cas d'utilisation. Retirer plus de couches empêcherait le modèle de bien récupérer suffisamment de détails sur les images entrantes ce qui ferait diminuer la précision du modèle. Nous allons donc supprimer des neurones au modèle.
+
+Par analyse des ressources prises par chaque couche, on a pu remarquer que les 2 couches de 64 neurones sont responsables de la majorité de la taille dans la Flash du modèle précédent. Il en est de même pour la première couche Dense qui comprend 512 neurones. Nous allons donc commencer par réduire le nombre de neurones de la première des 2 couches Denses restantes de 512 à 256 neurones afin de diviser par 4 le nombre de paramètres vectorisés provenant des couches convolutives. Egalement, nous réduisons le nombre de neurones des 2 dernières couches de convolution passant de 64 à 32 neurones chacune. 
+
+```mermaid
+flowchart LR
+    A["Entrée : Image (32x32x3)"] --> B["4 Couches Convolutives    Nb neurones : (32,32,32,32) -       Dropout : (/,0.2,/,0.2)    MaxPooling : (/,1,/,1)"]
+    B --> C["GlobalAveragePooling2D"]
+    C --> D["2 Couches Fully Connected    Nb neurones : (256,10) -  Dropout : (0.2,/)"]
+    D --> E["Sortie : Prédiction"]
+```
+
+On réalise l'entrainement de ce nouveau modèle afin de visualiser les effets de ces suppressions de neurones :
+
+![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_2-2-1.png)
+
+On remarque directement que le modèle est en sous-apprentissage. En effet, le modèle est plus performant sur les données de validation que d'apprentissage. L'objectif va être d'augmenter l'apprentissage du modèle pendant l'entrainement. Ainsi, comme précédemment, il va s'agir de diminuer la valeur des phases de Dropout. On réalise plusieurs tests et on en arrive à la configuration du modèle suivant :
+
+```mermaid
+flowchart LR
+    A["Entrée : Image (32x32x3)"] --> B["4 Couches Convolutives    Nb neurones : (32,32,32,32) -       Dropout : (/,0.15,/,0.15)    MaxPooling : (/,1,/,1)"]
+    B --> C["GlobalAveragePooling2D"]
+    C --> D["2 Couches Fully Connected    Nb neurones : (256,10) -  Dropout : (0.15,/)"]
+    D --> E["Sortie : Prédiction"]
+```
+
+Voici les résultats de l'entrainement :
+
+![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_2-2-2.png)
+
+On remarque que le modèle apprend correctement et à un bon rythme. Egalement, on remarque que la précision a augmenté par rapport à la configuration précédente passant de 71% à 73%. Cependant, la précision du modèle n'est pas encore suffisante, il nous faut encore l'améliorer. Dans cet objectif, il nous faut trouver un levier d'amélioration qui permettrait au modèle d'augmenter sa précision tout n'impactant pas les ressources mémoires prises par le modèle ainsi que son temps d'entrainement. Ce levier a tout été trouvé dans l'ajout d'une phase de Pooling de type "MaxPooling".
+
+Une phase de "Pooling" agit comme un compresseur de la donnée d'entrée. En effet, dans notre cas, la taille en pixel des images entrante de cette phase est divisée par 2. Ceci permet d'améliorer la qualité des caractéristiques uniques à chaque image que le modèle a appris à reconnaitre durant son apprentissage pour pouvoir bien classifier les images entrantes. Dans notre modèle, nous utilisons des "MaxPooling". Il s'agit d'un type de compression d'une image particulière. En effet, nous la paramètrons sur des zones de 2x2 pixels soit 4 pixels en tout composant chacune de ces zones. Cette phase va appliquer ces zones de 2x2 pixels aux images entrantes. Ces zones viennent glisser sur toute la surface des images entrantes. La règle de "MaxPooling" correspond au fait de ne retenir que le pixel de valeur maximal à chacune de ces zones sur l'image. Ainsi, au sein d'une zone locale, le seul pixel d'une valeur maximale sera retenu et les autres pixels seront laissés. Ainsi, les images de sortie de cette phase auront une taille en pixel divisée par 2.
+
+Cette phase de "MaxPooling" permet de diminuer le nombre de paramètres à traiter au sein des couches de neurones grâce au phénomène de compression qu'elle génère. Ainsi, les ressources prises par le modèle auront tendance à diminuer et la vitesse d'entrainement sera plus également court. De plus, en ne retenant que les valeurs maximales, cela permet au modèle de ne retenir que les caractéristiques les plus importantes de l'image et d'oublier les détails non important. Ainsi, cela va permettre au modèle d'améliorer sa précision car il sera en possession de caractéristiques plus distinctives pour classer les images. Enfin, le modèle devient plus robuste aux petites translations et au bruit sur l'image. Cette phase est tout à fait bénéfique pour notre modèle.
+
+Nous faisons donc le choix d'ajouter une phase de "MaxPooling" sur la deuxième couche convolutive afin d'améliorer la précision du modèle. Voici alors le schéma structurel du modèle :
+
+```mermaid
+flowchart LR
+    A["Entrée : Image (32x32x3)"] --> B["4 Couches Convolutives    Nb neurones : (32,32,32,32) -       Dropout : (/,0.15,/,0.15)    MaxPooling : (/,1,1,1)"]
+    B --> C["GlobalAveragePooling2D"]
+    C --> D["2 Couches Fully Connected    Nb neurones : (256,10) -  Dropout : (0.15,/)"]
+    D --> E["Sortie : Prédiction"]
+```
+
+Nous n'avons ajouté qu'une seule phase de MaxPooling supplémentaire car, en réalisant des tests, nous avons pu constater qu'ajouter 2 phases de MaxPooling supplémentaires réduisait l'Accuracy du modèle. A présent, nous réentrainons notre nouveau modèle afin de visualiser l'effet de l'ajout d'une phase de MaxPooling :
+
+![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_2-2.png)
+
+Nous remarquons l'apprentissage du modèle reste correct et qu'il n'y a pas d'overfitting. Egalement, on remarque que l'on a réussi à augmenter la précision du modèle de 73% à 77% soit 4% de plus. Enfin, nous implémentons ce nouveau modèle sur le MCU cible en utilisant CubeAI et voici les résultats obtenus :
+
+| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
+|-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
+|  Valeurs  | 174.25Ko / 2Mo | 146.14ko / 192ko | 5sec | 77.01% | 76% |
+
+![Test du Modèle 2-2 sur MCU (100ème test)](images/accuracy_mcu_modele2-2.png)
+
+Nous avons réussi à diviser la taille en Flash du modèle précédent (modèle 2-1) par plus de 2 en supprimant des neurones aux couches existantes. Cependant, la taille en mémoire RAM prise par le modèle a un petit peu augmenté de 0.21 Ko. Egalement, l'ajout de la phase de "MaxPooling" a permis d'augmenter la vitesse d'entrainement du modèle. Il s'entraine avec 0.5s de moins que sa version précédente.
+
+### 4.C Conception et implémentation d'un 3ème modèle - Modification du mode d'entrainement (Modèle 3 et Modèle 3-1)
+
+#### 4.C.1. Variation du Learning Rate (Modèle 3)
+
+Maintenant que nous avons supprimé des couches du modèle et ajouté une phase de "MaxPooling", nous allons continuer à supprimer des neurones aux couches restantes. Par analyse des ressources prises par chaque couche, comme les couches Dense prennent beaucoup de ressources, on a choisi de diminuer le nombre de neurones à la première couche Dense de 256 à 128. Egalement, on a choisi de diviser par 2 le nombre de neurones des 2 premières couches de convolution. Ceci aura pour effet de diminuer la taille en mémoire Flash prise par le modèle et d'augmenter la vitesse d'entrainement.
+
+Après avoir supprimé les différents neurones, nous avons réalisé différents entrainements afin de déterminer les valeurs les plus optimales du Dropout afin que l'apprentissage du modèle se réalise correctement. 
+
+Voici le nouveau schéma structurel du nouveau modèle :
+
+```mermaid
+flowchart LR
+    A["Entrée : Image (32x32x3)"] --> B["4 Couches Convolutives    Nb neurones : (16,16,32,32) -       Dropout : (/,0.1,/,0.1)    MaxPooling : (/,1,1,1)"]
+    B --> C["GlobalAveragePooling2D"]
+    C --> D["2 Couches Fully Connected    Nb neurones : (128,10) -  Dropout : (0.1,/)"]
+    D --> E["Sortie : Prédiction"]
+```
+
+Nous réalisons l'entrainement de notre modèle afin de visualiser les effets qu'ont la suppression des neurones :
+
+![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_3.png)
+
+Notre objectif est alors d'augmenter la précision du modèle. Cependant, ajouter une couche de "MaxPooling" aura pour effet de faire diminuer l'accuracy du modèle par rapport au modèle présent. Nous avons utilisé l'ensemble des éléments structurels du modèle de type VGG pour augmenter la précision du modèle. 
+
+A présent, nous souhaitons nous tourner vers la modification du mode d'entrainement du modèle afin d'augmenter sa précision. Nous allons notamment agir sur un paramètre important de l'entrainement qui est : le Learning Rate.
+
+Le Learning Rate est un paramètre numérique qui détermine l’amplitude de la modification des poids d’un modèle à chaque étape de l’entraînement, en fonction du gradient de l’erreur.
 
 ## 5. Sélection d'un nouveau microcontrôleur
 
