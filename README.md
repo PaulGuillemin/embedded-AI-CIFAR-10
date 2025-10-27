@@ -315,6 +315,14 @@ A présent, nous réentrainons notre nouveau modèle afin de visualiser l'effet 
 
 ![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_2-2.png)
 
+Nous remarquons l'apprentissage du modèle reste correct et qu'il n'y a pas d'overfitting. Egalement, on remarque que l'on a réussi à augmenter la précision du modèle de 73% à 77% soit 4% de plus. Enfin, nous implémentons ce nouveau modèle sur le MCU cible en utilisant CubeAI et voici les résultats obtenus :
+
+| Résultats | *Flash* | *RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
+|-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
+|  Valeurs  | 425.8Ko / 2Mo | 145.93ko / 192ko | 5sec | 77.01% | 76% |
+
+
+
 ## 5. Sélection d'un nouveau microcontrôleur
 
 
