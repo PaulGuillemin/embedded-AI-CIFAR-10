@@ -143,9 +143,9 @@ flowchart LR
 
 Egalement, voici les caractéristiques globales de stockage du modèle sur le microcontrôleur :
 
-| Résultats | *Flash* | *RAM* | *Temps entrainement* |
-|-----------|---------|-------|----------------------|
-| Valeurs | 5.12Mo / 2Mo | 148.56ko / 192ko | 6-7sec |
+| Résultats | *Flash* | *RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible* |
+|-----------|---------|-------|----------------------|----------------------------------------|--------------------------------------|
+| Valeurs | 5.12Mo / 2Mo | 148.56ko / 192ko | 6-7sec | 83.7% | Non-implémentable en l'état |
 
 On observe clairement que le modèle est beaucoup trop volumineux pour le microcontrôleur. Le modèle dépasse de 256% la taille de la flash de la carte. Pour ce qui est de la RAM, le modèle semble plutôt adapté. Cependant, il prend à lui seul 77.38% de la RAM du microcontrôleur ce qui est beaucoup. Notre objectif va alors être de trouver des solutions pour optimiser le modèle afin qu'il utilise moins de place dans le microcontrôleur mais, sans que le modèle ne perde trop en précision. Ce modèle ne peut donc pas être déployé dans le microcontrôleur pour des raisons de taille trop importante prise dans la mémoire du MCU.
 
@@ -163,7 +163,7 @@ Que ça soit pour les couches Fully Connected ou les couches convolutives, l'ajo
 
 Maintenant que nous avons pu analyser et étudier le modèle de base, nous souhaitons nous donner pour objectif d'optimiser ce modèle de base afin de diminuer sa taille Flash et RAM le plus possible en impactant le moins possible les performances d'Accuracy du modèle de base. Pour réaliser cela, nous allons détailler, dans la suite, l'ensemble des étapes et du processus de réflexion qui nous ont amené à concevoir un modèle plus optimisé que le modèle de base permettant d'être embarqué sur un microcontrôleur et d'avoir un temps d'entrainement court. 
 
-### 4.A. Conception et implémentation d'un 1er modèle - Remplacement de la couche Flatten
+### 4.A. Conception et implémentation d'un 1er modèle - Remplacement de la couche Flatten (Modèle 1 et Modèle 1-1)
 
 Pour réaliser la première optimisation du modèle de base, nous avons choisi de commencer par le remplacement de la couche "Flatten" par la couche "GlobalAveragePooling2D". "Flatten" correspond à la couche de vectorisation 1D que l'on a décrit précédemment. Cette couche aligne l'ensemble des données et paramètres de chaque image dans un vecteur 1D. Les données sont placées côte à côte. Dans le cas du modèle de base, le set d'images entrant dans la couche "Flatten" a pour taille (2,2,128) c'est-à-dire 128 images de taille 2x2 pixels. Il y a donc, au total, 128x2x2 = 512 paramètres à aligner dans un vecteur 1D. La couche "Flatten" va alors former un vecteur de sortie de taille 512. Le nombre de paramètres va alors être multiplié par le nombre de neurones dans chaque couche ce qui va entrainer une large augmentation de la mémoire RAM et de la mémoire Flash. Par exemple, pour la première couche "Dense" qui contient 1024 neurones, on aurait déjà 1024x512 = 524 288 paramètres. Notre objectif est donc de diminuer le nombre de paramètres propagés dans la partie "Fully Connected" du modèle.
 
@@ -189,15 +189,15 @@ Egalement, grâce à l'optimisation de la couche "Flatten" par remplacement de l
 
 En réalisant l'analyse de l'importation du nouveau modèle sur CubeAI adapté à notre MCU cible, les résultats montrent toujours que la taille en Flash est trop importante même si elle a diminué et la taille en RAM est correcte même si trop importante. En effet, notre modèle occupe 77.5% de la RAM totale ce qui ne laisse que peu de place à des applications utilisateurs en plus et au fonctionnement du système lui-même.
 
-| Résultats | *Flash* | *RAM* | *Temps entrainement* |
-|-----------|---------|-------|----------------------|
-| Valeurs | 3.64Mo / 2Mo | 148.71ko / 192ko | 7sec |
+| Résultats | *Flash* | *RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible* |
+|-----------|---------|-------|----------------------|----------------------------------------|--------------------------------------|
+| Valeurs | 3.64Mo / 2Mo | 148.71ko / 192ko | 7sec | 83.13% | Non-implémentable en l'état |
 
 On a remarqué que le remplacement de la couche "Flatten" a augmenté la taille du modèle en RAM de 0.15ko et son temps d'entrainement global de 0.3-0.5 secondes. En effet, la couche "GlobalAveragePooling2D" réalisant plus de calculs en faisant les moyennes des paramètres des images que la couche "Flatten" qui ne fait qu'aligner les paramètres dans un vecteur, ceci explique ces effets. 
 
-### 4.B Conception et implémentation d'un 2ème modèle - Suppression de couches et neurones superflus
+### 4.B Conception et implémentation d'un 2ème modèle - Suppression de couches et neurones superflus (Modèle 2, Modèle 2-1
 
-#### 4.B.1. Conception du modèle
+#### 4.B.1. Suppression de couches superflus (Modèle 2)
 
 Nous souhaitons à présent commencer l'optimisation du nouveau modèle précédent en supprimant des couches et neurones qui pourraient être superflus dans le modèle. Pour cela, nous avons analysons le nombre de paramètres par couche dans le modèle. En effet, notre objectif serait de supprimer le plus de paramètres possible ce qui limiterait la taille prise par notre modèle. 
 
@@ -225,7 +225,17 @@ On souhaite entrainer ce nouveau modèle afin de le tester pour évaluer l'impac
 
 ![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_2.png)
 
-On remarque que le modèle possède une Accuracy plus basse que le modèle précédent et qu'il n'y a pas d'overfitting, mais, que le modèle est moins efficace sur les données d'entrainement que sur les données de test. Pour régler ces paramètres, nous allons modifier en diminuant les valeurs de probabilité dans les couches de "Dropout" afin qu'il y ait moins de neurones éteint aléatoirement pendant l'entrainement. Ceci va alors permettre au modèle de mieux apprendre sur les données d'entrainement car il aura plus de neurones actifs disponibles et donc, d'améliorer son Accuracy globale. Nous avons fixé l'ensemble des probabilités des couches "Dropout" à 0.2 qui est la valeur la plus optimale pour l'apprentissage de notre modèle. En effet, nous avons réalisé de nombreux entrainements et les résultats les élevés se sont produits pour cette valeur-ci.
+On remarque que le modèle possède une Accuracy (de 77%) plus basse que le modèle précédent et qu'il n'y a pas d'overfitting, mais, que le modèle est moins efficace sur les données d'entrainement que sur les données de test. Egalement, on a choisit de l'intégrer sur CubeAI afin de vérifier la taille Flash et RAM que ce modèle prendrait sur le MCU cible et voici les résultats obtenus :
+
+| Résultats | *Flash* | *RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
+|-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
+|  Valeurs  | 425.8Ko / 2Mo | 145.93ko / 192ko | 5-6sec | 77.72% | 71% |
+
+On remarque que la taille prise par ce nouveau modèle dans la Flash est bien moindre par rapport au précédent modèle. En effet, en supprimant des couches au modèle, on a également supprimé des neurones. En sachant que le nombre de paramètres d'entrée d'une couche va être multiplié par le nombre de neurones présents (car chacun des neurones reçoit l'ensemble des paramètres à leur entrée), cela augmente considérablement le nombre de paramètres total présent dans le modèle. En supprimant des couches et, par conséquent, des neurones, on réduit considérablement le nombre de paramètres stockés dans la mémoire Flash. On remarque que l'on a diminué la mémoire RAM de 2.78 Ko et que le temps d'entrainement a également diminué de 1-1.5 secondes par rapport au modèle précédent. Cela s'explique par la simplification du modèle que l'on produit en supprimant des couches et des neurones. Comme il y a moins de paramètres à modifier, l'entrainement est alors plus rapide.
+
+#### 4.B.1. Ajustement du Dropout pour l'entrainement (Modèle 2-1)
+
+Pour régler ces paramètres, nous allons modifier en diminuant les valeurs de probabilité dans les couches de "Dropout" afin qu'il y ait moins de neurones éteint aléatoirement pendant l'entrainement. Ceci va alors permettre au modèle de mieux apprendre sur les données d'entrainement car il aura plus de neurones actifs disponibles et donc, d'améliorer son Accuracy globale. Nous avons fixé l'ensemble des probabilités des couches "Dropout" à 0.2 qui est la valeur la plus optimale pour l'apprentissage de notre modèle. En effet, nous avons réalisé de nombreux entrainements et les résultats les élevés se sont produits pour cette valeur-ci.
 
 On souhaite entrainer ce nouveau modèle afin de le tester. Voici ses courbes de Loss et d'Accuracy :
 
