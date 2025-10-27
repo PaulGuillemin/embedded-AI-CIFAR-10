@@ -279,7 +279,7 @@ flowchart LR
 
 On réalise l'entrainement de ce nouveau modèle afin de visualiser les effets de ces suppressions de neurones :
 
-![Test du Modèle 2-2-1 sur MCU (100ème test)](images/accuracy_mcu_modele2-2-1.png)
+![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_2-2-1.png)
 
 On remarque directement que le modèle est en sous-apprentissage. En effet, le modèle est plus performant sur les données de validation que d'apprentissage. L'objectif va être d'augmenter l'apprentissage du modèle pendant l'entrainement. Ainsi, comme précédemment, il va s'agir de diminuer la valeur des phases de Dropout. On réalise plusieurs tests et on en arrive à la configuration du modèle suivant :
 
@@ -293,7 +293,7 @@ flowchart LR
 
 Voici les résultats de l'entrainement :
 
-![Test du Modèle 2-2-2 sur MCU (100ème test)](images/accuracy_mcu_modele2-2-2.png)
+![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_2-2-2.png)
 
 On remarque que le modèle apprend correctement et à un bon rythme. Egalement, on remarque que la précision a augmenté par rapport à la configuration précédente passant de 71% à 73%. Cependant, la précision du modèle n'est pas encore suffisante, il nous faut encore l'améliorer. Dans cet objectif, il nous faut trouver un levier d'amélioration qui permettrait au modèle d'augmenter sa précision tout n'impactant pas les ressources mémoires prises par le modèle ainsi que son temps d'entrainement. Ce levier a tout été trouvé dans l'ajout d'une phase de Pooling de type "MaxPooling".
 
