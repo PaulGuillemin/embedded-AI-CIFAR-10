@@ -297,7 +297,19 @@ Voici les résultats de l'entrainement :
 
 On remarque que le modèle apprend correctement et à un bon rythme. Egalement, on remarque que la précision a augmenté par rapport à la configuration précédente passant de 71% à 73%. Cependant, la précision du modèle n'est pas encore suffisante, il nous faut encore l'améliorer. Dans cet objectif, il nous faut trouver un levier d'amélioration qui permettrait au modèle d'augmenter sa précision tout n'impactant pas les ressources mémoires prises par le modèle ainsi que son temps d'entrainement. Ce levier a tout été trouvé dans l'ajout d'une phase de Pooling de type "MaxPooling".
 
-Une phase de "Pooling" 
+Une phase de "Pooling" agit comme un compresseur de la donnée d'entrée. En effet, dans notre cas, la taille en pixel des images entrante de cette phase est divisée par 2. Ceci permet d'améliorer la qualité des caractéristiques uniques à chaque image que le modèle a appris à reconnaitre durant son apprentissage pour pouvoir bien classifier les images entrantes. Dans notre modèle, nous utilisons des "MaxPooling". Il s'agit d'un type de compression d'une image particulière. En effet, nous la paramètrons sur des zones de 2x2 pixels soit 4 pixels en tout composant chacune de ces zones. Cette phase va appliquer ces zones de 2x2 pixels aux images entrantes. Ces zones viennent glisser sur toute la surface des images entrantes. La règle de "MaxPooling" correspond au fait de ne retenir que le pixel de valeur maximal à chacune de ces zones sur l'image. Ainsi, au sein d'une zone locale, le seul pixel d'une valeur maximale sera retenu et les autres pixels seront laissés. Ainsi, les images de sortie de cette phase auront une taille en pixel divisée par 2.
+
+Cette phase de "MaxPooling" permet de diminuer le nombre de paramètres à traiter au sein des couches de neurones grâce au phénomène de compression qu'elle génère. Ainsi, les ressources prises par le modèle auront tendance à diminuer et la vitesse d'entrainement sera plus également court. De plus, en ne retenant que les valeurs maximales, cela permet au modèle de ne retenir que les caractéristiques les plus importantes de l'image et d'oublier les détails non important. Ainsi, cela va permettre au modèle d'améliorer sa précision car il sera en possession de caractéristiques plus distinctives pour classer les images. Enfin, le modèle devient plus robuste aux petites translations et au bruit sur l'image. Cette phase est tout à fait bénéfique pour notre modèle.
+
+Nous faisons donc le choix d'ajouter une phase de "MaxPooling" sur la deuxièmes couche convolutive afin d'améliorer la précision du modèle. Voici alors le schéma structurel du modèle :
+
+```mermaid
+flowchart LR
+    A["Entrée : Image (32x32x3)"] --> B["4 Couches Convolutives    Nb neurones : (32,32,32,32) -       Dropout : (/,0.15,/,0.15)    MaxPooling : (/,1,1,1)"]
+    B --> C["GlobalAveragePooling2D"]
+    C --> D["2 Couches Fully Connected    Nb neurones : (256,10) -  Dropout : (0.15,/)"]
+    D --> E["Sortie : Prédiction"]
+```
 
 ## 5. Sélection d'un nouveau microcontrôleur
 
