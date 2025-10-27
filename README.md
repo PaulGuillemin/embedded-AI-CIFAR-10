@@ -29,16 +29,10 @@ La première question à se poser quand on souhaite concevoir un modèle d'Intel
 
 La banque d'images CIFAR-10 contient, comme son nom nous l'indique, 10 classes d'images :  
 
-0. Avion
-1. Voiture
-2. Oiseau
-3. Chat 
-4. Cerf
-5. Chien
-6. Grenouille
-7. Cheval
-8. Bateau
-9. Camion
+| Nom de la classe | *Avion* | *Voiture* | *Oiseau* | *Chat* | *Cerf* | *Chien* | *Grenouille* | *Cheval* | *Bateau* | *Camion* |
+|------------------|-------|---------|--------|------|------|-------|------------|--------|--------|--------|
+| Numéro de la classe | *0* | *1* | *2* | *3* | *4* | *5* | *6* | *7* | *8* | *9* | 
+
 
 ![Illustration de la banque d'images CIFAR-10](images/cifar10.png)
 
@@ -62,15 +56,13 @@ Voici les caractéristiques du modèle d'IA initial :
 Le modèle d'IA est un CNN, modèle particulièrement adapté à la reconnaissance d'images. En effet, il prend en entrée, une seule image. Chaque image en entrée du modèle d'IA correspond à un tableau de 3 matrices pour les couleurs RGB et chacune des matrices est de taille 32x32 du nombre de pixels présent dans chaque image. Dans un premier temps, l'objectif, pour le modèle d'IA, est de transformer l'image d'entrée pour pouvoir faire ressortir ses caractéristiques (convolution). Celles-ci permettront alors, dans un second temps, au modèle d'IA, de comparer l'ensemble des caractéristiques de l'image aux caractéristiques des images des différentes classes. Le modèle produira établira alors les probabilités de ressemblances pour chacune des classes ce qui nous amènera à conclure de la classification faite par le modèle.
 organisé de la manière suivante :
 
-[Entrée : Image-(32x32x3)]  
-↓  
-[6 Couches convolutives]   
-↓  
-[1 Couche de vectorisation 1D]    
-↓  
-[3 Couches Fully Connected]    
-↓  
-[Sortie :Prédiction]   
+```mermaid
+flowchart LR
+    A["Entrée : Image (32x32x3)"] --> B["6 Couches Convolutives"]
+    B --> C["Couche de Vectorisation 1D"]
+    C --> D["3 Couches Fully Connected"]
+    D --> E["Sortie : Prédiction"]
+```
 
 Cette organisation va lui permettre de classifier les images en entrée. 
 
@@ -78,17 +70,21 @@ Cette organisation va lui permettre de classifier les images en entrée.
 
 Les couches convolutives du modèle vont permettre de pouvoir faire ressortir les caractéristiques de l'image en entrée. En effet, chaque couche de convolution de notre modèle est composée des éléments suivants successivement :
 
-1. n masques de convolution
-2. une fonction d'activation non-linéaire (ReLU, dans notre cas)
-3. Phase de dropout (pas sur toutes les couches)
-4. Batch-normalisation
-5. Phase de pooling (pas sur toutes les couches)
+```mermaid
+flowchart LR
+    A["Entrée : Image (nxmxp)"] --> B["N masques de convolution"]
+    B --> C["Fonction d'activation non-linéaire"]
+    C --> D["Phase de dropout (pas sur toutes les couches)"]
+    D --> E["Batch-normalisation"]
+    E --> F["Phase de pooling (pas sur toutes les couches)"]
+    F --> G["Sortie : N images (n/2xm/2xp) si pooling (nxmxp) sinon"]
+```
 
 **Masque de convolution :** Chaque couche de convolution possède un certain nombre de masques de convolution différents. Ces masques correspondent à des matrices de taille généralement 3x3 avec une profondeur de 3 matrices (pour les couleurs RGB) qui vont naviguer sur l'ensemble des pixels de l'image d'entrée. Ainsi, des produits scalaires vont être réalisés entre les valeur du masque convolutionnel et les valeurs des pixels de l'image d'entrée. De cette manière, une nouvelle image est créée dont les valeurs de chaque pixel équivaut au produit scalaires du pixel correspondant sur l'image d'entrée par la valeur de la matrice du masque convolutionnel. Ainsi, on fabrique autant de nouvelles images qu'il y a de masques convolutionnels différents sur la couche. De cette manière, les caractéristiques de l'image vont commencer à ressortir sur les nouvelles images ainsi créées. 
 
 **Fonction d'activation :** La fonction d'activation permet d'introduire de la non-linéarité dans les calculs réalisés par les neurones du réseau. Il existe plusieurs fonction d'activation, toutes non-linéaires, mais, dans notre cas, nous utilisons la fonction ReLU (Rectified Linear Unit. Cette fonction produit une sortie de 0 pour tout x∈]-∞;0] et x pour tout x∈[0;+∞[. Elle est simple à calculer donc tout à fait aux réseaux de neurones profonds. Elle permet une meilleure performance de calcul du réseau. C'est pourquoi elle est utilisée dans ce modèle.
 
-**Dropout :** La notion de Dropout n'intervient pas à chaque couche convolutionnelle. Le dropout prend en argument une probabilité. En effet, pendant l'exécution du modèle, aléatoirement, la phase de Dropout va venir mettre à 0 plusieurs neurones avec une probabilité égale à la probabilité marquée en entrée. Cette phase permet notamment d'équilibrer l'entrainement du modèle et empêcher la prépondérance de certains paramètres devant d'autres. Cette phase va donc permettre "d'éteindre" certains neurones selon une certaine probabilité afin de ne pas les prendre en compte dans la suite des calculs pour diminuer leur importance. Cela permet donc d'équilibrer l'importance de tous les paramètres et donc d'optimiser la précision du modèle d'IA.
+**Dropout :** La notion de Dropout n'intervient pas à chaque couche convolutionnelle. Le dropout prend en argument une probabilité. En effet, pendant l'exécution du modèle, aléatoirement, la phase de Dropout va venir mettre à 0 plusieurs neurones avec une probabilité égale à la probabilité marquée en entrée. Cette phase permet notamment d'équilibrer l'entrainement du modèle et empêcher la prépondérance de certains paramètres devant d'autres. Cette phase va donc permettre "d'éteindre" certains neurones selon une certaine probabilité afin de ne pas les prendre en compte dans la suite des calculs pour diminuer leur importance. Cela permet donc d'équilibrer l'importance de tous les paramètres et donc d'optimiser la précision du modèle d'IA. Cette couche est notamment très utile lorsque l'on cherche à lutter contre le surapprentissage (overfitting) ou sous-apprentissage (underfitting) du modèle.
 
 **Batch-normalisation :** Cette phase correspond à la normalisation des sorties selon des mini-batch de la couche convolutionnelle entre 0 et 1 pendant l'entraienement ce qui va permettre de stabiliser l'apprentissage du modèle et de poursuivre le travail de régularisation et d'équilibrage de l'ensemble des paramètres du modèle.
 
