@@ -231,6 +231,8 @@ On remarque que le modèle possède une Accuracy (de 77%) plus basse que le mod�
 |-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
 |  Valeurs  | 425.8Ko / 2Mo | 145.93ko / 192ko | 5-6sec | 77.72% | 71% |
 
+![Test du Modèle 2 sur MCU (100ème test)](images/accuracy_mcu_modele2.png)
+
 On remarque que la taille prise par ce nouveau modèle dans la Flash est bien moindre par rapport au précédent modèle. En effet, en supprimant des couches au modèle, on a également supprimé des neurones. En sachant que le nombre de paramètres d'entrée d'une couche va être multiplié par le nombre de neurones présents (car chacun des neurones reçoit l'ensemble des paramètres à leur entrée), cela augmente considérablement le nombre de paramètres total présent dans le modèle. En supprimant des couches et, par conséquent, des neurones, on réduit considérablement le nombre de paramètres stockés dans la mémoire Flash. On remarque que l'on a diminué la mémoire RAM de 2.78 Ko et que le temps d'entrainement a également diminué de 1-1.5 secondes par rapport au modèle précédent. Cela s'explique par la simplification du modèle que l'on produit en supprimant des couches et des neurones. Comme il y a moins de paramètres à modifier, l'entrainement est alors plus rapide.
 
 #### 4.B.1. Ajustement du Dropout pour l'entrainement (Modèle 2-1)
@@ -239,7 +241,7 @@ Pour régler ces paramètres, nous allons modifier en diminuant les valeurs de p
 
 On souhaite entrainer ce nouveau modèle afin de le tester. Voici ses courbes de Loss et d'Accuracy :
 
-[IMAGE MODELE 2-1]
+![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_2-1.png)
 
 On remarque que l'Accuracy du modèle a augmenté de 77% à 79% donc, très proche de l'Accuracy initial qui était de 80%. On remarque également qu'il n'y a pas d'overfitting et que le modèle a bien atteint son point optimal d'apprentissage. La méthode de correction par variation du taux de Dropout a bien fonctionné.
 
