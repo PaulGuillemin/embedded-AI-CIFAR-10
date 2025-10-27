@@ -195,7 +195,7 @@ En réalisant l'analyse de l'importation du nouveau modèle sur CubeAI adapté �
 
 On a remarqué que le remplacement de la couche "Flatten" a augmenté la taille du modèle en RAM de 0.15ko et son temps d'entrainement global de 0.3-0.5 secondes. En effet, la couche "GlobalAveragePooling2D" réalisant plus de calculs en faisant les moyennes des paramètres des images que la couche "Flatten" qui ne fait qu'aligner les paramètres dans un vecteur, ceci explique ces effets. 
 
-### 4.B Conception et implémentation d'un 2ème modèle - Suppression de couches et neurones superflus (Modèle 2, Modèle 2-1
+### 4.B Conception et implémentation d'un 2ème modèle - Suppression de couches et neurones superflus (Modèle 2, Modèle 2-1 et Modèle 2-2)
 
 #### 4.B.1. Suppression de couches superflus (Modèle 2)
 
@@ -259,9 +259,18 @@ On remarque que l'Accuracy du modèle a augmenté de 77% à 79% donc, très proc
 |-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
 |  Valeurs  | 425.8Ko / 2Mo | 145.93ko / 192ko | 5-6sec | 79.04% | 82% |
 
-Maintenant que nous avons supprimé des couches du modèle, nous allons supprimer des neurones aux couches restantes. Nous commençons par réduire le nombre de neurones de la première des 2 couches Denses restantes de 512 à 256 neurones afin de diviser par 4 le nombre de paramètres vectorisés provenant des couches convolutives. Les couches Dense sont très lourdes en nombre de paramètres ce qui explique nous en supprimons des neurones. De plus, nous divisons par 
+![Test du Modèle 2-1 sur MCU (100ème test)](images/accuracy_mcu_modele2-1.png)
 
-#### 4.B.2 Implémentation du modèle sur le MCU cible
+On remarque que faire varier la valeur du Dropout ne modifie pas la taille du modèle dans les mémoires. Cependant, durant nos différents tests de modèles, on a pu remarquer que plus la valeur du Dropout est élevée, plus le temps d'entrainement diminue. Cela découle directement du fait que le Dropout "éteint" des neurones en les mettant à 0 pendant l'entrainement ce qui diminue le nombre de paramètres et donc accélère l'entrainement. Dans notre cas, le temps d'entrainement a bien diminué, mais, très faiblement du fait de la faible variation de valeur du Dropout que nous avons appliqué.
+
+#### 4.B.1. Suppression de neurones et ajout du Pooling (Modèle 2-2)
+
+Maintenant que nous avons supprimé des couches du modèle, nous allons supprimer des neurones aux couches restantes. En effet, après avoir réalisé différents tests sur l'optimisation du modèle précédent, nous sommes arrivé à la conclusion que 4 couches semble être le nombre de couche idéal pour notre cas d'utilisation. Retirer plus de couches empêcherait le modèle de bien récupérer suffisamment de détails sur les images entrantes ce qui ferait diminuer la précision du modèle. Nous allons donc supprimer des neurones au modèle.
+
+Par analyse des ressources prises par chaque couche, on a pu remarquer que les 2 couches de 64 neurones sont responsables de la majorité de la taille dans la Flash du modèle précédent. Il en est de même pour la première couche Dense qui comprend 512 neurones. Nous allons donc commencer par réduire le nombre de neurones de la première des 2 couches Denses restantes de 512 à 256 neurones afin de diviser par 4 le nombre de paramètres vectorisés provenant des couches convolutives. Egalement, nous réduisons le nombre de neurones des 2 dernières couches de convolution passant de 64 à 32 neurones chacune. 
+
+On réalise l'entrainement de ce nouveau modèle afin de visualiser les effets de ces suppressions de neurones :
+
 
 ## 5. Sélection d'un nouveau microcontrôleur
 
