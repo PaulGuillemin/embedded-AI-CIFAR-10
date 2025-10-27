@@ -269,8 +269,35 @@ Maintenant que nous avons supprimé des couches du modèle, nous allons supprime
 
 Par analyse des ressources prises par chaque couche, on a pu remarquer que les 2 couches de 64 neurones sont responsables de la majorité de la taille dans la Flash du modèle précédent. Il en est de même pour la première couche Dense qui comprend 512 neurones. Nous allons donc commencer par réduire le nombre de neurones de la première des 2 couches Denses restantes de 512 à 256 neurones afin de diviser par 4 le nombre de paramètres vectorisés provenant des couches convolutives. Egalement, nous réduisons le nombre de neurones des 2 dernières couches de convolution passant de 64 à 32 neurones chacune. 
 
+```mermaid
+flowchart LR
+    A["Entrée : Image (32x32x3)"] --> B["4 Couches Convolutives    Nb neurones : (32,32,32,32) -       Dropout : (/,0.2,/,0.2)"]
+    B --> C["GlobalAveragePooling2D"]
+    C --> D["2 Couches Fully Connected    Nb neurones : (256,10) -  Dropout : (0.2,/)"]
+    D --> E["Sortie : Prédiction"]
+```
+
 On réalise l'entrainement de ce nouveau modèle afin de visualiser les effets de ces suppressions de neurones :
 
+![Test du Modèle 2-2-1 sur MCU (100ème test)](images/accuracy_mcu_modele2-2-1.png)
+
+On remarque directement que le modèle est en sous-apprentissage. En effet, le modèle est plus performant sur les données de validation que d'apprentissage. L'objectif va être d'augmenter l'apprentissage du modèle pendant l'entrainement. Ainsi, comme précédemment, il va s'agir de diminuer la valeur des phases de Dropout. On réalise plusieurs tests et on en arrive à la configuration du modèle suivant :
+
+```mermaid
+flowchart LR
+    A["Entrée : Image (32x32x3)"] --> B["4 Couches Convolutives    Nb neurones : (32,32,32,32) -       Dropout : (/,0.15,/,0.15)"]
+    B --> C["GlobalAveragePooling2D"]
+    C --> D["2 Couches Fully Connected    Nb neurones : (256,10) -  Dropout : (0.15,/)"]
+    D --> E["Sortie : Prédiction"]
+```
+
+Voici les résultats de l'entrainement :
+
+![Test du Modèle 2-2-2 sur MCU (100ème test)](images/accuracy_mcu_modele2-2-2.png)
+
+On remarque que le modèle apprend correctement et à un bon rythme. Egalement, on remarque que la précision a augmenté par rapport à la configuration précédente passant de 71% à 73%. Cependant, la précision du modèle n'est pas encore suffisante, il nous faut encore l'améliorer. Dans cet objectif, il nous faut trouver un levier d'amélioration qui permettrait au modèle d'augmenter sa précision tout n'impactant pas les ressources mémoires prises par le modèle ainsi que son temps d'entrainement. Ce levier a tout été trouvé dans l'ajout d'une phase de Pooling de type "MaxPooling".
+
+Une phase de "Pooling" 
 
 ## 5. Sélection d'un nouveau microcontrôleur
 
