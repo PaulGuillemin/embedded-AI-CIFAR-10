@@ -343,7 +343,15 @@ flowchart LR
     D --> E["Sortie : Prédiction"]
 ```
 
+Nous réalisons l'entrainement de notre modèle afin de visualiser les effets qu'ont la suppression des neurones :
 
+![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_3.png)
+
+Notre objectif est alors d'augmenter la précision du modèle. Cependant, ajouter une couche de "MaxPooling" aura pour effet de faire diminuer l'accuracy du modèle par rapport au modèle présent. Nous avons utilisé l'ensemble des éléments structurels du modèle de type VGG pour augmenter la précision du modèle. 
+
+A présent, nous souhaitons nous tourner vers la modification du mode d'entrainement du modèle afin d'augmenter sa précision. Nous allons notamment agir sur un paramètre important de l'entrainement qui est : le Learning Rate.
+
+Le Learning Rate est un paramètre numérique qui détermine l’amplitude de la modification des poids d’un modèle à chaque étape de l’entraînement, en fonction du gradient de l’erreur.
 
 ## 5. Sélection d'un nouveau microcontrôleur
 
