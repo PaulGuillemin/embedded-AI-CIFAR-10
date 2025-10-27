@@ -131,10 +131,21 @@ A présent, notre objectif est de déterminer si le modèle est embarquable dans
 
 ![Analyse par CubeIA du modèle d'IA](images/1.png)
 
+Cette analyse correspond au schéma du modèle de base suivant :
+
+```mermaid
+flowchart LR
+    A["Entrée : Image (32x32x3)"] --> B["6 Couches Convolutives    Nb neurones : (32,32,64,64,128,128)"]
+    B --> C["Flatten"]
+    C --> D["3 Couches Fully Connected    Nb neurones : (1024,512,10)"]
+    D --> E["Sortie : Prédiction"]
+```
+
 Egalement, voici les caractéristiques globales de stockage du modèle sur le microcontrôleur :
 
-- **Flash :** 5.12 Mo / 2 Mo
-- **RAM :** 148.56 ko / 192 ko
+| Résultats | *Flash* | *RAM* | *Temps entrainement* |
+|-----------|---------|-------|----------------------|
+| Valeurs | 5.12Mo / 2Mo | 148.56ko / 192ko | 6-7sec |
 
 On observe clairement que le modèle est beaucoup trop volumineux pour le microcontrôleur. Le modèle dépasse de 256% la taille de la flash de la carte. Pour ce qui est de la RAM, le modèle semble plutôt adapté. Cependant, il prend à lui seul 77.38% de la RAM du microcontrôleur ce qui est beaucoup. Notre objectif va alors être de trouver des solutions pour optimiser le modèle afin qu'il utilise moins de place dans le microcontrôleur mais, sans que le modèle ne perde trop en précision. Ce modèle ne peut donc pas être déployé dans le microcontrôleur pour des raisons de taille trop importante prise dans la mémoire du MCU.
 
@@ -158,6 +169,16 @@ Pour réaliser la première optimisation du modèle de base, nous avons choisi d
 
 La couche "GlobalAveragePooling2D", pour sa part, utilise une autre méthode de vectorisation des données. En effet, cette couche va réaliser la moyenne de l'ensemble des valeurs des pixels d'une image et générer, en sortie, une valeur moyenne par image. Ainsi, appliqué au modèle de base, cette couche recevrait un set d'images de taille (2,2,128) et générerait, en sortie, une vecteur 1D de taille 128. En effet, le set d'images contient 128 images de 2x2 pixels chacune. La couche "GlobalAveragePooling2D" va faire une moyenne de l'ensemble des paramètres de chacune des images. Ainsi, au lieu d'aligner les 4 paramètres de chacune des images, cette couche ne va aligner qu'un seul paramètre par image correspondant à la moyenne des 4 paramètres qui constituent l'image à la base. On obtient alors un vecteur 1D de 128 paramètres en sortie de cette couche. 
 
+Voici le schéma du nouveau modèle intégrant la nouvelle couche de vectorisation 1D :
+
+```mermaid
+flowchart LR
+    A["Entrée : Image (32x32x3)"] --> B["6 Couches Convolutives    Nb neurones : (32,32,64,64,128,128)"]
+    B --> C["GlobalAveragePooling2D"]
+    C --> D["3 Couches Fully Connected    Nb neurones : (1024,512,10)"]
+    D --> E["Sortie : Prédiction"]
+```
+
 Voici les courbes de Loss et d'Accuracy associé aux entrainements et aux tests du modèle ainsi optimisé :
 
 ![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_1.png)
@@ -172,17 +193,37 @@ En réalisant l'analyse de l'importation du nouveau modèle sur CubeAI adapté �
 |-----------|---------|-------|----------------------|
 | Valeurs | 3.64Mo / 2Mo | 148.71ko / 192ko | 7sec |
 
+On a remarqué que le remplacement de la couche "Flatten" a augmenté la taille du modèle en RAM de 0.15ko et son temps d'entrainement global de 0.3-0.5 secondes. En effet, la couche "GlobalAveragePooling2D" réalisant plus de calculs en faisant les moyennes des paramètres des images que la couche "Flatten" qui ne fait qu'aligner les paramètres dans un vecteur, ceci explique ces effets. 
+
 ### 4.B Conception et implémentation d'un 2ème modèle - Suppression de couches et neurones superflus
 
 #### 4.B.1. Conception du modèle
 
 Nous souhaitons à présent commencer l'optimisation du nouveau modèle précédent en supprimant des couches et neurones qui pourraient être superflus dans le modèle. Pour cela, nous avons analysons le nombre de paramètres par couche dans le modèle. En effet, notre objectif serait de supprimer le plus de paramètres possible ce qui limiterait la taille prise par notre modèle. 
 
-Pour commencer, nous supprimons les 2 dernières couches convolutives qui comportent chacune 128 neurones du CNN et qui représentent, à elles seules, 17.3% de la taille totale du modèle. Puis, nous faisons le choix de supprimer la premère couche "Dense" qui comporte 1024 neurones et qui représente, à elle seule, plus de 50% de la taille totale du modèle. 
+Pour commencer, nous supprimons les 2 dernières couches convolutives qui comportent chacune 128 neurones du CNN et qui représentent, à elles seules, 17.3% de la taille totale du modèle. Le schéma du modèle devient alors : 
 
-On souhaite entrainer ce nouveau modèle afin de le tester. Voici ses courbes de Loss et d'Accuracy :
+```mermaid
+flowchart LR
+    A["Entrée : Image (32x32x3)"] --> B["4 Couches Convolutives    Nb neurones : (32,32,64,64)"]
+    B --> C["GlobalAveragePooling2D"]
+    C --> D["3 Couches Fully Connected    Nb neurones : (1024,512,10)"]
+    D --> E["Sortie : Prédiction"]
+```
 
-[IMAGE MODELE 2]
+Puis, nous faisons le choix de supprimer la premère couche "Dense" qui comporte 1024 neurones et qui représente, à elle seule, plus de 50% de la taille totale du modèle. Le schéma du modèle devient alors : 
+
+```mermaid
+flowchart LR
+    A["Entrée : Image (32x32x3)"] --> B["4 Couches Convolutives    Nb neurones : (32,32,64,64)"]
+    B --> C["GlobalAveragePooling2D"]
+    C --> D["2 Couches Fully Connected    Nb neurones : (512,10)"]
+    D --> E["Sortie : Prédiction"]
+```
+
+On souhaite entrainer ce nouveau modèle afin de le tester pour évaluer l'impact qu'a eu la suppression de l'ensemble de ces couches et neurones. Voici les courbes de Loss et d'Accuracy de ce nouveau modèle :
+
+![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_2.png)
 
 On remarque que le modèle possède une Accuracy plus basse que le modèle précédent et qu'il n'y a pas d'overfitting, mais, que le modèle est moins efficace sur les données d'entrainement que sur les données de test. Pour régler ces paramètres, nous allons modifier en diminuant les valeurs de probabilité dans les couches de "Dropout" afin qu'il y ait moins de neurones éteint aléatoirement pendant l'entrainement. Ceci va alors permettre au modèle de mieux apprendre sur les données d'entrainement car il aura plus de neurones actifs disponibles et donc, d'améliorer son Accuracy globale. Nous avons fixé l'ensemble des probabilités des couches "Dropout" à 0.2 qui est la valeur la plus optimale pour l'apprentissage de notre modèle. En effet, nous avons réalisé de nombreux entrainements et les résultats les élevés se sont produits pour cette valeur-ci.
 
