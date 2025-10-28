@@ -387,7 +387,11 @@ flowchart LR
 
 On entraîne le nouveau modèle afin de visualiser l'impact qu'a eu la suppression de ces neurones sur les performances du modèle. Pour l'entraînement, nous gardons la variation du Learning Rate précédente et nous ajustons les valeurs de Dropout :
 
+![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_3-1.png)
 
+| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement - (1 époque)* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
+|-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
+|  Valeurs  | 61.31Ko / 2Mo | 80.14ko / 192ko | 3-4sec | 72.46% | 72% |
 
 ## 5. Sélection d'un nouveau microcontrôleur
 
