@@ -389,9 +389,13 @@ On entraîne le nouveau modèle afin de visualiser l'impact qu'a eu la suppressi
 
 ![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_3-1.png)
 
+Nous réentrainons après avoir changé la Loss. Voici les résultats obtenus :
+
+
+
 | Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement - (1 époque)* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
 |-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
-|  Valeurs  | 61.31Ko / 2Mo | 80.14ko / 192ko | 3-4sec | 72.46% | 72% |
+|  Valeurs  | 61.31Ko / 2Mo | 80.14ko / 192ko | 3-4sec | 72.46% | 73% |
 
 ![Test du Modèle 3 sur MCU (100ème test)](images/accuracy_mcu_modele3-1.png)
 
