@@ -361,9 +361,9 @@ Ainsi, le choix du Learning Rate influence directement la rapidité et la qualit
 
 Ainsi, nous avons pu constater qu'un Learning Rate de 0.001 était pratique pour la stabilité de l'entrainement mais provoquait une accuracy finale moins élevée. Un Learning Rate plus important à 0.01 était également pratique pour un meilleur entraînement du modèle et une meilleure accuracy finale mais au prix d'une assez forte instabilité des résultats. Par conséquent, nous avons fait le choix de faire varier le Learning Rate pendant l'entrainement du modèle afin de bénéficier des avantages de chacune des valeurs de Learning Rate. 
 
-Voici le schéma de variation que nous avons suivi : 
-
 Au début, LR = 0.001, puis, LR augmente linéairement jusqu'à 0.01 par pas de 0.002 par époque, et enfin, diminue sur les époques suivantes progressivement jusqu'à revenir au LR initial de 0.001. Ainsi, en gardant la même structure du modèle que précédemment, on réalise l'entraînement de notre modèle en faisant varier le Learning Rate comme décrit précédemment. Voici les résultats de l'entrainement :
+
+![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_3-0-1.png)
 
 ## 5. Sélection d'un nouveau microcontrôleur
 
