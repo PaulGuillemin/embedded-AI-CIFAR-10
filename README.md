@@ -355,13 +355,15 @@ Ainsi, pendant l'entraînement, l'objectif est d'atteindre le minimum global de 
 
 Si le Learning Rate est trop élevé, les modifications des poids sont trop importantes, ce qui empêche le modèle de se stabiliser : il peut alors diverger, c’est-à-dire que la Loss ne diminue plus ou oscille sans jamais atteindre une valeur minimale. À l’inverse, si le Learning Rate est trop faible, les ajustements des poids deviennent trop faibles, et l’apprentissage progresse très lentement. Dans certains cas, le modèle peut même se bloquer dans un minimum local de la Loss avant d’avoir trouvé les valeurs de poids du minimum global qui minimisent réellement la Loss.
 
-Ainsi, le choix du Learning Rate influence directement la rapidité et la qualité de la convergence du modèle vers un minimum de la Loss. Optimiser et adapter l'entrainement à un modèle d'IA revient donc en partie à optimiser la valeur du Learning Rate afin de trouver le minimum global de la Loss du modèle. 
-
 ![Schéma explicatif du principe de Learning Rate](images/Schema_LR_corr2.png)
 
-Nous allons notamment agir sur un paramètre important de l'entrainement qui est : le Learning Rate.
+Ainsi, le choix du Learning Rate influence directement la rapidité et la qualité de la convergence du modèle vers un minimum de la Loss. Optimiser et adapter l'entrainement à un modèle d'IA revient donc en partie à optimiser la valeur du Learning Rate afin de trouver le minimum global de la Loss du modèle. Dans le cadre de l'optimisation de notre modèle, nous souhaitons donc modifier la valeur du Learning Rate. Actuellement, tous les modèles précédents ont été entraînés avec un Learning Rate fixe de 0.001. Nous avons réalisé plusieurs tests avec des Learning Rate différent dont 0.01. A cette valeur, l'entraînement était plus rapide et l'accuracy finale un peu plus importante qu'à 0.001. Cependant, l'entraînement était assez instable ce qui avait pour conséquence que l'accuracy finale oscillait beaucoup entre 71% et 78% ce qui n'est pas idéal.
 
-Le Learning Rate est un paramètre numérique qui détermine l’amplitude de la modification des poids d’un modèle à chaque étape de l’entraînement, en fonction du gradient de l’erreur.
+Ainsi, nous avons pu constater qu'un Learning Rate de 0.001 était pratique pour la stabilité de l'entrainement mais provoquait une accuracy finale moins élevée. Un Learning Rate plus important à 0.01 était également pratique pour un meilleur entraînement du modèle et une meilleure accuracy finale mais au prix d'une assez forte instabilité des résultats. Par conséquent, nous avons fait le choix de faire varier le Learning Rate pendant l'entrainement du modèle afin de bénéficier des avantages de chacune des valeurs de Learning Rate. 
+
+Voici le schéma de variation que nous avons suivi : 
+
+Au début, LR = 0.001, puis, LR augmente linéairement jusqu'à 0.01 par pas de 0.002 par époque, et enfin, diminue sur les époques suivantes progressivement jusqu'à revenir au LR initial de 0.001. Ainsi, en gardant la même structure du modèle que précédemment, on réalise l'entraînement de notre modèle en faisant varier le Learning Rate comme décrit précédemment. Voici les résultats de l'entrainement :
 
 ## 5. Sélection d'un nouveau microcontrôleur
 
