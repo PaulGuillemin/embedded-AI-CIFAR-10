@@ -393,6 +393,8 @@ On entraîne le nouveau modèle afin de visualiser l'impact qu'a eu la suppressi
 |-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
 |  Valeurs  | 61.31Ko / 2Mo | 80.14ko / 192ko | 3-4sec | 72.46% | 72% |
 
+![Test du Modèle 3 sur MCU (100ème test)](images/accuracy_mcu_modele3-1.png)
+
 ## 5. Sélection d'un nouveau microcontrôleur
 
 
