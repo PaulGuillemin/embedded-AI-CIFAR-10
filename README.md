@@ -365,6 +365,8 @@ Au début, LR = 0.001, puis, LR augmente linéairement jusqu'à 0.01 par pas de 
 
 ![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_3-01.png)
 
+On remarque que l’entraînement s’est bien déroulé. Le modèle apprend bien. De plus, on remarque que la précision du modèle a bien augmenté par rapport à l’entraînement sans variation du Learning Rate en augmentant d’environ 3% passant de 74% à 76.7% environ 77%. En effet, ce résultat signifie que le minimum de la Loss trouvé pendant l’entraînement avec un Learning Rate fixe valant 0.001 est un minimum local. En augmentant la valeur du Learning Rate et en la faisant varier pendant le second entraînement, nous avons permis à l’algorithme d’optimisation (rétropropagation du gradient) de trouver un autre minimum à la Loss qui est, pour sa part, plus important. Ainsi, il pourrait s’agir, sans certitude, d’un minimum global. Egalement, la variation du Learning Rate pendant l’entraînement du modèle a permis de stabiliser l’entrainement.   
+
 | Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement - (1 époque)* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
 |-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
 |  Valeurs  | 105.7Ko / 2Mo | 80.14ko / 192ko | 3-4sec | 76.99% | 78% |
