@@ -375,6 +375,8 @@ A présent, nous souhaitons implémenter notre modèle d'IA dans le microcontrô
 
 ![Test du Modèle 3 sur MCU (100ème test)](images/accuracy_mcu_modele3.png)
 
+On remarque immédiatement que les ressources en RAM prises par le modèle d’IA dans le MCU ont considérablement diminué passant de 77.1% de RAM totale du MCU à 41.7% de la RAM totale. De cette manière, cela va permettre à un éventuel utilisateur de pouvoir intégrer une application en parallèle du modèle d’IA. La RAM du MCU ne sera pas saturé. Egalement, les ressources Flash prises par le modèle d’IA dans le MCU ont beaucoup diminué (presque divisés par 2 par rapport au modèle précédent). Enfin, le temps d’entraînement du modèle sur une époque a diminué de 1.5 secondes ce qui est considérable. Toutes ces observations peuvent être expliquées par le fait que l’on a supprimé de nombreux neurones au sein des différentes couches du modèle. De cette manière, nous avons simplifié la structure du réseau de neurones, nous avons diminué le nombre de paramètres à mettre à jour et à retenir, nous avons diminué le nombre de calculs réalisés par le MCU et, par conséquent, nous avons diminué le temps d’entraînement du modèle. Ce modèle est donc plus performant et optimisé que le modèle proposé initialement.
+
 #### 4.C.2. Changement de la Loss (Modèle 3-1)
 
 Nous souhaitons continuer à supprimer des neurones au modèle précédent afin de diminuer au maximum les ressources mémoires prises par le modèle dans le microcontrôleur. 
