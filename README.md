@@ -422,6 +422,10 @@ Ainsi, l’introduction de ce nouveau paramètre va nous permettre de résoudre 
 
 ![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_3-1-1.png)
 
+On remarque que l’entraînement est correctement réalisé et que la particularité a bien été corrigé. Egalement, la précision du modèle a bien augmenté de plus d’ 1%. Cela montre bien que le changement de la Loss a bien permis de corriger la particularité de comportement du modèle.
+
+A présent, on souhaite implémenter ce modèle sur le MCU cible. Voici les résultats obtenus :
+
 | Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement - (1 époque)* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
 |-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
 |  Valeurs  | 61.31Ko / 2Mo | 80.14ko / 192ko | 3-4sec | 72.76% | 73% |
