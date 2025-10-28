@@ -365,6 +365,10 @@ Au début, LR = 0.001, puis, LR augmente linéairement jusqu'à 0.01 par pas de 
 
 ![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_3-0-1.png)
 
+| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
+|-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
+|  Valeurs  | 105.7Ko / 2Mo | 80.14ko / 192ko | 3-4sec | 76.99% | 78% |
+
 ## 5. Sélection d'un nouveau microcontrôleur
 
 
