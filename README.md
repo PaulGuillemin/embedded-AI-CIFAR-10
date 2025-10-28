@@ -393,7 +393,7 @@ Ainsi, il s'agit du modèle le plus otpimisé que nous avons réalisé.
 
 #### 4.C.2. Changement de la Loss (Modèle 3-1)
 
-Nous souhaitons continuer à supprimer des neurones au modèle précédent afin de diminuer au maximum les ressources mémoires prises par le modèle dans le microcontrôleur. 
+Nous souhaitons continuer à supprimer des neurones au modèle précédent afin de diminuer au maximum les ressources mémoires prises par le modèle dans le microcontrôleur. Ainsi, nous divisons par 2 le nombre de neurones sur les 2 dernières couches de convolution et nous adaptons les valeurs de Dropout à l’aide nombreux tests.  
 
 Voici le schéma structurel du nouveau modèle :
 
