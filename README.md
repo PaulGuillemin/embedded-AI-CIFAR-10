@@ -381,6 +381,8 @@ En terme de précision, nous pouvons remarquer que ce modèle a une précision i
 
 Le modèle actuel que nous proposons correspond au modèle le plus équilibré, stable et optimisé que l’on a réalisé. C’est pourquoi, nous allons utiliser ce modèle pour la suite de nos manipulations et notamment en « Sécurité de l’Intelligence Artificielle ».
 
+Dans l’interface de CubeAI, il y a une section qui nous permet d’activer une compression supplémentaire au modèle importé afin qu’il prenne moins de ressources. Après avoir testé les compressions HIGH et MEDIUM, la compression la plus optimale pour notre modèle est LOW. En effet, lors de la phase de tests, c’est la compression qui permet de réduire encore un peu plus la taille du modèle dans la Flash du MCU sans impacter la taille en RAM et la précision. Voici les résultats obtenus :
+
 #### 4.C.2. Changement de la Loss (Modèle 3-1)
 
 Nous souhaitons continuer à supprimer des neurones au modèle précédent afin de diminuer au maximum les ressources mémoires prises par le modèle dans le microcontrôleur. 
