@@ -143,7 +143,7 @@ flowchart LR
 
 Egalement, voici les caractéristiques globales de stockage du modèle sur le microcontrôleur :
 
-| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible* |
+| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement - (1 époque)* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible* |
 |-----------|---------|-------|----------------------|----------------------------------------|--------------------------------------|
 | Valeurs | 5.12Mo / 2Mo | 148.56ko / 192ko | 6-7sec | 83.7% | Non-implémentable en l'état |
 
@@ -189,7 +189,7 @@ Egalement, grâce à l'optimisation de la couche "Flatten" par remplacement de l
 
 En réalisant l'analyse de l'importation du nouveau modèle sur CubeAI adapté à notre MCU cible, les résultats montrent toujours que la taille en Flash est trop importante même si elle a diminué et la taille en RAM est correcte même si trop importante. En effet, notre modèle occupe 77.5% de la RAM totale ce qui ne laisse que peu de place à des applications utilisateurs en plus et au fonctionnement du système lui-même.
 
-| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible* |
+| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement - (1 époque)* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible* |
 |-----------|---------|-------|----------------------|----------------------------------------|--------------------------------------|
 | Valeurs | 3.64Mo / 2Mo | 148.71ko / 192ko | 7sec | 83.13% | Non-implémentable en l'état |
 
@@ -227,7 +227,7 @@ On souhaite entrainer ce nouveau modèle afin de le tester pour évaluer l'impac
 
 On remarque que le modèle possède une Accuracy (de 77%) plus basse que le modèle précédent et qu'il n'y a pas d'overfitting, mais, que le modèle est moins efficace sur les données d'entrainement que sur les données de test. Egalement, on a choisit de l'intégrer sur CubeAI afin de vérifier la taille Flash et RAM que ce modèle prendrait sur le MCU cible et voici les résultats obtenus :
 
-| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
+| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement - (1 époque)* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
 |-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
 |  Valeurs  | 425.8Ko / 2Mo | 145.93ko / 192ko | 5-6sec | 77.72% | 71% |
 
@@ -255,7 +255,7 @@ On souhaite maintenant entrainer ce nouveau modèle afin de vérifier que la mod
 
 On remarque que l'Accuracy du modèle a augmenté de 77% à 79% donc, très proche de l'Accuracy initial qui était de 80%. On remarque également qu'il n'y a pas d'overfitting et que le modèle a bien atteint son point optimal d'apprentissage. La méthode de correction par variation du taux de Dropout a donc bien fonctionné.
 
-| Résultats | * MCU Flash* | *MCU RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
+| Résultats | * MCU Flash* | *MCU RAM* | *Temps entrainement - (1 époque)* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
 |-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
 |  Valeurs  | 425.8Ko / 2Mo | 145.93ko / 192ko | 5-6sec | 79.04% | 82% |
 
@@ -317,7 +317,7 @@ Nous n'avons ajouté qu'une seule phase de MaxPooling supplémentaire car, en r�
 
 Nous remarquons l'apprentissage du modèle reste correct et qu'il n'y a pas d'overfitting. Egalement, on remarque que l'on a réussi à augmenter la précision du modèle de 73% à 77% soit 4% de plus. Enfin, nous implémentons ce nouveau modèle sur le MCU cible en utilisant CubeAI et voici les résultats obtenus :
 
-| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
+| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement - (1 époque)* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
 |-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
 |  Valeurs  | 174.25Ko / 2Mo | 146.14ko / 192ko | 5sec | 77.01% | 76% |
 
@@ -361,13 +361,33 @@ Ainsi, le choix du Learning Rate influence directement la rapidité et la qualit
 
 Ainsi, nous avons pu constater qu'un Learning Rate de 0.001 était pratique pour la stabilité de l'entrainement mais provoquait une accuracy finale moins élevée. Un Learning Rate plus important à 0.01 était également pratique pour un meilleur entraînement du modèle et une meilleure accuracy finale mais au prix d'une assez forte instabilité des résultats. Par conséquent, nous avons fait le choix de faire varier le Learning Rate pendant l'entrainement du modèle afin de bénéficier des avantages de chacune des valeurs de Learning Rate. 
 
-Au début, LR = 0.001, puis, LR augmente linéairement jusqu'à 0.01 par pas de 0.002 par époque, et enfin, diminue sur les époques suivantes progressivement jusqu'à revenir au LR initial de 0.001. Ainsi, en gardant la même structure du modèle que précédemment, on réalise l'entraînement de notre modèle en faisant varier le Learning Rate comme décrit précédemment. Voici les résultats de l'entrainement :
+Au début, LR = 0.001, puis, LR augmente linéairement jusqu'à 0.01 par pas de 0.002 par époque, et enfin, diminue sur les époques suivantes progressivement jusqu'à un LR de 0.0001. Ainsi, en gardant la même structure du modèle que précédemment, on réalise l'entraînement de notre modèle en faisant varier le Learning Rate comme décrit précédemment. Voici les résultats de l'entrainement :
 
-![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_3-0-1.png)
+![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_3-01.png)
 
-| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
+| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement - (1 époque)* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
 |-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
 |  Valeurs  | 105.7Ko / 2Mo | 80.14ko / 192ko | 3-4sec | 76.99% | 78% |
+
+![Test du Modèle 3 sur MCU (100ème test)](images/accuracy_mcu_modele3.png)
+
+#### 4.C.2. Changement de la Loss (Modèle 3-1)
+
+Nous souhaitons continuer à supprimer des neurones au modèle précédent afin de diminuer au maximum les ressources mémoires prises par le modèle dans le microcontrôleur. 
+
+Voici le schéma structurel du nouveau modèle :
+
+```mermaid
+flowchart LR
+    A["Entrée : Image (32x32x3)"] --> B["4 Couches Convolutives    Nb neurones : (16,16,16,16) -       Dropout : (/,0.05,/,0.05)    MaxPooling : (/,1,1,1)"]
+    B --> C["GlobalAveragePooling2D"]
+    C --> D["2 Couches Fully Connected    Nb neurones : (128,10) -  Dropout : (0.06,/)"]
+    D --> E["Sortie : Prédiction"]
+```
+
+On entraîne le nouveau modèle afin de visualiser l'impact qu'a eu la suppression de ces neurones sur les performances du modèle. Pour l'entraînement, nous gardons la variation du Learning Rate précédente et nous ajustons les valeurs de Dropout :
+
+
 
 ## 5. Sélection d'un nouveau microcontrôleur
 
