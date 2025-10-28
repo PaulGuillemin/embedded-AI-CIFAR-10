@@ -389,7 +389,7 @@ Dans l’interface de CubeAI, il y a une section qui nous permet d’activer une
 
 ![Test du Modèle 3 sur MCU (100ème test)](images/accuracy_mcu_modele3-01.png)
 
-Ainsi, il s'agit du modèle le plus otpimisé que nous réalisé.
+Ainsi, il s'agit du modèle le plus otpimisé que nous avons réalisé.
 
 #### 4.C.2. Changement de la Loss (Modèle 3-1)
 
