@@ -353,7 +353,7 @@ A présent, nous souhaitons nous tourner vers la modification du mode d'entraine
 
 Ainsi, pendant l'entraînement, l'objectif est d'atteindre le minimum global de la Loss. L'ajustement des poids du modèle qu'il réalise pendant l'entrainement se fait par pas. Ce pas est appelé le Learning Rate. Il s'agit d'un paramètre numérique qui détermine l’amplitude de la modification des poids d’un modèle à chaque étape de l’entraînement, en fonction du gradient de la Loss.
 
-![Schéma explicatif du principe de Learning Rate](images/Schema_LR.png)
+![Schéma explicatif du principe de Learning Rate](images/Schema_LR_corr.png)
 
 Nous allons notamment agir sur un paramètre important de l'entrainement qui est : le Learning Rate.
 
