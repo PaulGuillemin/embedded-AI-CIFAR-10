@@ -428,9 +428,11 @@ A présent, on souhaite implémenter ce modèle sur le MCU cible. Voici les rés
 
 | Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement - (1 époque)* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
 |-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
-|  Valeurs  | 61.31Ko / 2Mo | 80.14ko / 192ko | 3-4sec | 72.76% | 73% |
+|  Valeurs  | 61.31Ko / 2Mo | 80.14ko / 192ko | 3-4sec | 72.76% | 72% |
 
 ![Test du Modèle 3 sur MCU (100ème test)](images/accuracy_mcu_modele3-1.png)
+
+On remarque que l’on a bien diminué les ressources en Flash prise par le modèle dans le MCU. Cependant, les ressources en RAM n’ont pas diminué ni évolué. Egalement, le temps d’entraînement du modèle sur une époque n’a pas non plus diminué. Ainsi, à la vue de la forte diminution de la précision du modèle, cette optimisation n’est pas pertinante.
 
 ## 5. Sélection d'un nouveau microcontrôleur
 
