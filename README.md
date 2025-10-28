@@ -383,6 +383,14 @@ Le modèle actuel que nous proposons correspond au modèle le plus équilibré, 
 
 Dans l’interface de CubeAI, il y a une section qui nous permet d’activer une compression supplémentaire au modèle importé afin qu’il prenne moins de ressources. Après avoir testé les compressions HIGH et MEDIUM, la compression la plus optimale pour notre modèle est LOW. En effet, lors de la phase de tests, c’est la compression qui permet de réduire encore un peu plus la taille du modèle dans la Flash du MCU sans impacter la taille en RAM et la précision. Voici les résultats obtenus :
 
+| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement - (1 époque)* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
+|-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
+|  Valeurs  | 91.96Ko / 2Mo | 80.14ko / 192ko | 3-4sec | 76.99% | 78% |
+
+![Test du Modèle 3 sur MCU (100ème test)](images/accuracy_mcu_modele3-01.png)
+
+Ainsi, il s'agit du modèle le plus otpimisé que nous réalisé.
+
 #### 4.C.2. Changement de la Loss (Modèle 3-1)
 
 Nous souhaitons continuer à supprimer des neurones au modèle précédent afin de diminuer au maximum les ressources mémoires prises par le modèle dans le microcontrôleur. 
