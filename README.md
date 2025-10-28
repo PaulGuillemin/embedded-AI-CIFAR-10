@@ -349,7 +349,13 @@ Nous réalisons l'entrainement de notre modèle afin de visualiser les effets qu
 
 Notre objectif est alors d'augmenter la précision du modèle. Cependant, ajouter une couche de "MaxPooling" aura pour effet de faire diminuer l'accuracy du modèle par rapport au modèle présent. Nous avons utilisé l'ensemble des éléments structurels du modèle de type VGG pour augmenter la précision du modèle. 
 
-A présent, nous souhaitons nous tourner vers la modification du mode d'entrainement du modèle afin d'augmenter sa précision. Nous allons notamment agir sur un paramètre important de l'entrainement qui est : le Learning Rate.
+A présent, nous souhaitons nous tourner vers la modification du mode d'entrainement du modèle afin d'augmenter sa précision. L’entraînement d’un modèle d'IA consiste à amener ce modèle à apprendre à partir d’un ensemble de données afin qu’il soit capable de faire des prédictions en reconnaîssant des motifs de manière autonome. Ce processus repose sur un principe : le modèle effectue d’abord des prédictions aléatoires, puis compare ces prédictions aux valeurs réelles issues du jeu de données. L’écart entre les deux, appelé erreur ou fonction de perte ou Loss, indique dans quelle mesure le modèle s’est trompé. À partir de cette erreur, un algorithme d’optimisation, souvent basé sur la descente de gradient (rétropropagation du gradient), calcule la direction dans laquelle les paramètres internes du modèle (poids) doivent être ajustés pour réduire cette erreur. Le modèle répète cette opération un grand nombre de fois, en ajustant progressivement ses poids, jusqu’à atteindre un équilibre où les prédictions deviennent les plus précises possibles. Cela constitue l'ensemble du processus de la phase d'entraînement d'un modèle d'IA.
+
+Ainsi, pendant l'entraînement, l'objectif est d'atteindre le minimum global de la Loss. L'ajustement des poids du modèle qu'il réalise pendant l'entrainement se fait par pas. Ce pas est appelé le Learning Rate. Il s'agit d'un paramètre numérique qui détermine l’amplitude de la modification des poids d’un modèle à chaque étape de l’entraînement, en fonction du gradient de la Loss.
+
+
+
+Nous allons notamment agir sur un paramètre important de l'entrainement qui est : le Learning Rate.
 
 Le Learning Rate est un paramètre numérique qui détermine l’amplitude de la modification des poids d’un modèle à chaque étape de l’entraînement, en fonction du gradient de l’erreur.
 
