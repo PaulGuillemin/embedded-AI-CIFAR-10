@@ -379,6 +379,8 @@ On remarque immédiatement que les ressources en RAM prises par le modèle d’I
 
 En terme de précision, nous pouvons remarquer que ce modèle a une précision inférieure de 0.02% par rapport au modèle précédent et de 3.15% par rapport au modèle initial. Dans le même temps, les ressources prises par le modèle en Flash et en RAM ont considérablement été diminué. En taille de Flash, celle-ci a presque été divisé par 2 par rapport au modèle précédent et divisé par 47.4 par rapport au modèle initial. En taille RAM, celle-ci a presque été divisé par 2 par rapport au modèle précédent et au modèle initial. Le temps d’entraînement sur une époque a été divisé par 2 par rapport au modèle initial. Ainsi, l’ensemble de l’amélioration de ces paramètres permettent de montrer que les optimisations du modèle sont pertinents malgré la perte de quelques pourcents.
 
+Le modèle actuel que nous proposons correspond au modèle le plus équilibré, stable et optimisé que l’on a réalisé. C’est pourquoi, nous allons utiliser ce modèle pour la suite de nos manipulations et notamment en « Sécurité de l’Intelligence Artificielle ».
+
 #### 4.C.2. Changement de la Loss (Modèle 3-1)
 
 Nous souhaitons continuer à supprimer des neurones au modèle précédent afin de diminuer au maximum les ressources mémoires prises par le modèle dans le microcontrôleur. 
