@@ -228,7 +228,7 @@ On remarque que le modèle possède une Accuracy (de 77%) plus basse que le mod�
 
 | Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement - (1 époque)* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
 |-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
-|  Valeurs  | 425.8Ko / 2Mo | 145.93ko / 192ko | 5-6sec | 77.72% | 71% |
+|  Valeurs  | 425.8Ko / 2Mo | 145.93ko / 192ko | 5-6sec | 77.72% | 76% |
 
 ![Test du Modèle 2 sur MCU (100ème test)](images/accuracy_mcu_modele2.png)
 
