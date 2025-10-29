@@ -48,8 +48,7 @@ Voici les caractéristiques du modèle d'IA initial :
 
 - **Taille :** 5.12 Mo
 - **Nombre de paramètres :** 1,344,042 paramètres
-- **Précision :** 83.7%
-- **Image à introduire**
+- **Précision :** 80.14%
 
 ### 1.C. Analyse structurelle du modèle d'IA
 
@@ -229,7 +228,7 @@ On remarque que le modèle possède une Accuracy (de 77%) plus basse que le mod�
 
 | Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement - (1 époque)* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
 |-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
-|  Valeurs  | 425.8Ko / 2Mo | 145.93ko / 192ko | 5-6sec | 77.72% | 71% |
+|  Valeurs  | 425.8Ko / 2Mo | 145.93ko / 192ko | 5-6sec | 77.72% | 76% |
 
 ![Test du Modèle 2 sur MCU (100ème test)](images/accuracy_mcu_modele2.png)
 
@@ -435,5 +434,48 @@ A présent, on souhaite implémenter ce modèle sur le MCU cible. Voici les rés
 On remarque que l’on a bien diminué les ressources en Flash prise par le modèle dans le MCU. Cependant, les ressources en RAM n’ont pas diminué ni évolué. Egalement, le temps d’entraînement du modèle sur une époque n’a pas non plus diminué. Ainsi, à la vue de la forte diminution de la précision du modèle, cette optimisation n’est pas pertinante.
 
 ## 5. Sélection d'un nouveau microcontrôleur
+
+Maintenant que nous avons réalisé l'optimisation du modèle d'IA de classification des images de la banque CIFAR-10 et que nous avons choisi le modèle 3 en tant que modèle optimisé, nous souhaitons sélectionner un nouveau microcontrôleur que la cible qui serait plus adapté à notre modèle. 
+
+Tout d'abord, commençons par établir les critères de choix du microcontrôleur :
+
+    - Taille RAM : supérieure ou égale à 2*80.14ko = 160.28ko
+    - Taille Flash : supérieure ou égale à 2*91.96ko = 183.92ko
+    - Fréquence de calcul : supérieure ou égale à 120 KHz
+
+Ensuite, nous avons choisi de nous tourner vers un microcontrôleur de l'entreprise STMicroelectronics. En effet, leurs microcontrôleurs sont largement disponibles sur le marché et ils sont compatibles avec une grande partie de la technologie existante car ils peuvent être programmés de bout en bout entièrement. Enfin, cette entreprise a conçu un logiciel qui permet d'embarquer et compresser des modèles d'IA dans leurs microcontrôleurs et qui se nomme CubeAI. Il semble donc plus pertinent pour l'ensemble de ces raisons de choisir un de leurs microcontrôleurs.
+
+En entrant sur le site de STMicroelectronics et en allant dans le répertoire des microcontrôleurs, on a cette classification : 
+
+![Classification des types de microcontrôleur de STMicroelectronics](images/ST_choix1.png)
+
+Dans le cadre d'un modèle d'IA, 2 catégories de performances seraient pertinantes : la catégorie "High Performance" et la catégorie "Ultra-low-power". Les microcontrôleurs de la catégories "High Performance" auront une fréquence d'horloge très élevée donc le temps d'inférence des modèles d'IA sera très réduit, ce qui est pertinent pour l'optimisation du fonctionnement de notre modèle. Cependant, cette catégorie de microcontrôleur requiert une forte consommation en énergie ce qui n'est pas pertinant dans le cadre d'une application industrielle. Ainsi, notre 1er critère sera la consommation énergétique qui devra être très faible. Nous allons donc choisir la catégorie "Ultra-low-power".
+
+Dans cette catégorie, notre objectif va être de choisir un microcontrôleur avec les performances MCU les plus importantes. Pour cela, nous allons regarder 2 indicateurs : le score "CoreMark" qui évalue la puissance de calcul d'un coeur embarqué et la fréquence d'horloge du MCU. 
+
+Notre objectif est de choisir le microcontrôleur avec un MCU qui possède une fréquence d'horloge la plus élevée possible afin que le MCU puisse réaliser les calculs de paramètres du modèle d'IA le plus rapidement possible. Cela va réduire considérablement le temps d'inférence qui est crucial pour l'optimisation de notre modèle d'IA. Egalement, notre objectif va être de choisir le MCU avec un score "CoreMark" le plus élevé possible. En effet, il mesure la capacité du MCU à exécuter du code typique d’un système embarqué, pas seulement la rapidité à laquelle son horloge tourne.
+
+Dans notre cas, nous allons choisir la série de microcontrôleur "STM32U5". En effet, il possède le score "CoreMark" (651) et la fréquence d'horloge (160MHz) les plus élevés de toute la catégorie "Ultra-low-power".
+
+Par la suite, plusieurs configurations de microcontrôleurs nous sont proposées (elles sont classées par ordre croissant de la taille de la configuration et il y en a plus que sur l'image ci-dessous) :
+
+![Classification des configurations de microcontrôleur de la catégorie "Ultra-low-power" de STMicroelectronics](images/ST_choix2.png)
+
+Actuellement, notre modèle d'IA optimisé fait une taille de 100 Ko en Flash et 80 Ko en RAM. Ainsi, dans l'optique de l'optimisation des coûts dans le cadre d'une application industrielle, il n'est pas nécessaire d'avoir une Flash de 2Mo ou plus. De même, il n'est pas nécessaire d'avoir une RAM de 786Ko. Une RAM de 274Ko est bien suffisante car notre modèle d'IA ne représenterait que 29.2% de la RAM totale ce qui laisse une place considérable pour les applications utilisateurs. Ainsi, nous allons nous intéresser aux configurations "STM32U535/545".
+
+Après avoir sélectionné les configurations de type "STM32U535/545", une classification de microcontrôleurs nous est proposé :
+
+![Classification des microcontrôleurs de configurations "STM32U535/545" de STMicroelectronics](images/ST_choix3.png)
+
+Comme explicité précédemment, dans un objectif d'optimisation des coûts autour du MCU, nous allons choisir la configuration avec 256Ko de Flash et 274Ko de RAM. Enfin, dans le cadre d'une application industrielle, ce microcontrôleur pourrait être associé à de nombreux capteurs, intégré dans un vaste réseau ou posséder de nombreuses liaisons avec d'autres microcontrôleurs. C'est pourquoi, nous souhaitons choisir le microcontrôleur avec un maximum de pins. Nous choisissons donc le microcontrôleur "STM32U535VC" qui possède 256 Ko de Flash, 274 Ko de RAM et 100 pins. Egalement, en terme de taille, il est quasisment aussi grand que les autres de la même configuration.
+
+Ainsi, pour des raisons, d'application industrielle, d'optimisation des coûts, de performance du MCU, de taille des ressources Flash et RAM disponible, le nouveau microcontrôleur que nous choisissons est le microcontrôleur "STM32U535VCI6".
+
+## 6. Sécurité de l'Intelligence Artificielle
+
+
+
+
+
 
 

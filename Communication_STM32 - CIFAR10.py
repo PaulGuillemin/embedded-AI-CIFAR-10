@@ -56,7 +56,7 @@ def read_output_from_STM32(serial_port):
     return float_values
 
 
-def evaluate_model_on_STM32(iterations, serial_port):
+def evaluate_model_on_STM32(debut,iterations, serial_port):
     """
     Evaluates the accuracy of a machine learning model on an STM32 device.
 
@@ -68,7 +68,7 @@ def evaluate_model_on_STM32(iterations, serial_port):
         float: The accuracy of the model, as a percentage.
     """
     accuracy = 0
-    for i in range(iterations):
+    for i in range(debut,iterations):
         print(f"----- Iteration {i+1} -----")
         send_inputs_to_STM32(X_test[i], serial_port)
         output = read_output_from_STM32(serial_port)
@@ -91,4 +91,4 @@ if __name__ == '__main__':
         print("Synchronised")
 
         print("Evaluating model on STM32...")
-        error = evaluate_model_on_STM32(100, ser)
+        error = evaluate_model_on_STM32(0,100, ser)
