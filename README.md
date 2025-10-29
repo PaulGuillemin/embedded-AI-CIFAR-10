@@ -48,8 +48,7 @@ Voici les caractéristiques du modèle d'IA initial :
 
 - **Taille :** 5.12 Mo
 - **Nombre de paramètres :** 1,344,042 paramètres
-- **Précision :** 83.7%
-- **Image à introduire**
+- **Précision :** 80.14%
 
 ### 1.C. Analyse structurelle du modèle d'IA
 
@@ -435,5 +434,13 @@ A présent, on souhaite implémenter ce modèle sur le MCU cible. Voici les rés
 On remarque que l’on a bien diminué les ressources en Flash prise par le modèle dans le MCU. Cependant, les ressources en RAM n’ont pas diminué ni évolué. Egalement, le temps d’entraînement du modèle sur une époque n’a pas non plus diminué. Ainsi, à la vue de la forte diminution de la précision du modèle, cette optimisation n’est pas pertinante.
 
 ## 5. Sélection d'un nouveau microcontrôleur
+
+Maintenant que nous avons réalisé l'optimisation du modèle d'IA de classification des images de la banque CIFAR-10 et que nous avons choisi le modèle 3 en tant que modèle optimisé, nous souhaitons sélectionner un nouveau microcontrôleur que la cible qui serait plus adapté à notre modèle. 
+
+Tout d'abord, commençons par établir les critères de choix du microcontrôleur :
+
+    - Taille RAM : supérieure ou égale à 2*80.14ko = 160.28ko
+    - Taille Flash : supérieure ou égale à 2*91.96ko = 183.92ko
+    - Fréquence de calcul : supérieure ou égale à 120 KHz
 
 
