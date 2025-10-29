@@ -459,8 +459,20 @@ Dans notre cas, nous allons choisir la série de microcontrôleur "STM32U5". En 
 
 Par la suite, plusieurs configurations de microcontrôleurs nous sont proposées (elles sont classées par ordre croissant de la taille de la configuration et il y en a plus que sur l'image ci-dessous) :
 
-![Classification des types de microcontrôleur de la catégorie "Ultra-low-power" de STMicroelectronics](images/ST_choix2.png)
+![Classification des configurations de microcontrôleur de la catégorie "Ultra-low-power" de STMicroelectronics](images/ST_choix2.png)
 
 Actuellement, notre modèle d'IA optimisé fait une taille de 100 Ko en Flash et 80 Ko en RAM. Ainsi, dans l'optique de l'optimisation des coûts dans le cadre d'une application industrielle, il n'est pas nécessaire d'avoir une Flash de 2Mo ou plus. De même, il n'est pas nécessaire d'avoir une RAM de 786Ko. Une RAM de 274Ko est bien suffisante car notre modèle d'IA ne représenterait que 29.2% de la RAM totale ce qui laisse une place considérable pour les applications utilisateurs. Ainsi, nous allons nous intéresser aux configurations "STM32U535/545".
+
+Après avoir sélectionné les configurations de type "STM32U535/545", une classification de microcontrôleurs nous est proposé :
+
+![Classification des microcontrôleurs de configurations "STM32U535/545" de STMicroelectronics](images/ST_choix3.png)
+
+Comme explicité précédemment, dans un objectif d'optimisation des coûts autour du MCU, nous allons choisir la configuration avec 256Ko de Flash et 274Ko de RAM. Enfin, dans le cadre d'une application industrielle, ce microcontrôleur pourrait être associé à de nombreux capteurs, intégré dans un vaste réseau ou posséder de nombreuses liaisons avec d'autres microcontrôleurs. C'est pourquoi, nous souhaitons choisir le microcontrôleur avec un maximum de pins. Nous choisissons donc le microcontrôleur "STM32U535VC" qui possède 256 Ko de Flash, 274 Ko de RAM et 100 pins. Egalement, en terme de taille, il est quasisment aussi grand que les autres de la même configuration.
+
+Voici le diagramme du type de microcontrôleur choisi :
+
+
+
+
 
 
