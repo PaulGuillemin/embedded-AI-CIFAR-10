@@ -457,6 +457,10 @@ Notre objectif est de choisir le microcontrôleur avec un MCU qui possède une f
 
 Dans notre cas, nous allons choisir la série de microcontrôleur "STM32U5". En effet, il possède le score "CoreMark" (651) et la fréquence d'horloge (160MHz) les plus élevés de toute la catégorie "Ultra-low-power".
 
+Par la suite, plusieurs configurations de microcontrôleurs nous sont proposées (elles sont classées par ordre croissant de la taille de la configuration et il y en a plus que sur l'image ci-dessous) :
 
+![Classification des types de microcontrôleur de la catégorie "Ultra-low-power" de STMicroelectronics](images/ST_choix2.png)
+
+Actuellement, notre modèle d'IA optimisé fait une taille de 100 Ko en Flash et 80 Ko en RAM. Ainsi, dans l'optique de l'optimisation des coûts dans le cadre d'une application industrielle, il n'est pas nécessaire d'avoir une Flash de 2Mo ou plus. De même, il n'est pas nécessaire d'avoir une RAM de 786Ko. Une RAM de 274Ko est bien suffisante car notre modèle d'IA ne représenterait que 29.2% de la RAM totale ce qui laisse une place considérable pour les applications utilisateurs. Ainsi, nous allons nous intéresser aux configurations "STM32U535/545".
 
 
