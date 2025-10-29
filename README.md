@@ -443,4 +443,7 @@ Tout d'abord, commençons par établir les critères de choix du microcontrôleu
     - Taille Flash : supérieure ou égale à 2*91.96ko = 183.92ko
     - Fréquence de calcul : supérieure ou égale à 120 KHz
 
+Ensuite, nous avons choisi de nous tourner vers un microcontrôleur de l'entreprise STMicroelectronics. En effet, leurs microcontrôleurs sont largement disponibles sur le marché et ils sont compatibles avec une grande partie de la technologie existante car ils peuvent être programmés de bout en bout entièrement. Enfin, cette entreprise a conçu un logiciel qui permet d'embarquer et compresser des modèles d'IA dans leurs microcontrôleurs et qui se nomme CubeAI. Il semble donc plus pertinent pour l'ensemble de ces raisons de choisir un de leurs microcontrôleurs.
+
+En entrant sur le site de STMicroelectronics et en allant dans le répertoire des microcontrôleurs, on a cette classification : 
 
