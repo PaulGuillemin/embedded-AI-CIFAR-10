@@ -447,3 +447,12 @@ Ensuite, nous avons choisi de nous tourner vers un microcontrôleur de l'entrepr
 
 En entrant sur le site de STMicroelectronics et en allant dans le répertoire des microcontrôleurs, on a cette classification : 
 
+![Classification des types de microcontrôleur de STMicroelectronics](images/ST_choix1.png)
+
+Dans le cadre d'un modèle d'IA, 2 catégories de performances seraient pertinantes : la catégorie "High Performance" et la catégorie "Ultra-low-power". Les microcontrôleurs de la catégories "High Performance" auront une fréquence d'horloge très élevée donc le temps d'inférence des modèles d'IA sera très réduit, ce qui est pertinent pour l'optimisation du fonctionnement de notre modèle. Cependant, cette catégorie de microcontrôleur requiert une forte consommation en énergie ce qui n'est pas pertinant dans le cadre d'une application industrielle. Ainsi, notre 1er critère sera la consommation énergétique qui devra être très faible. Nous allons donc choisir la catégorie "Ultra-low-power".
+
+Dans cette catégorie, 
+
+
+
+
