@@ -451,7 +451,11 @@ En entrant sur le site de STMicroelectronics et en allant dans le répertoire de
 
 Dans le cadre d'un modèle d'IA, 2 catégories de performances seraient pertinantes : la catégorie "High Performance" et la catégorie "Ultra-low-power". Les microcontrôleurs de la catégories "High Performance" auront une fréquence d'horloge très élevée donc le temps d'inférence des modèles d'IA sera très réduit, ce qui est pertinent pour l'optimisation du fonctionnement de notre modèle. Cependant, cette catégorie de microcontrôleur requiert une forte consommation en énergie ce qui n'est pas pertinant dans le cadre d'une application industrielle. Ainsi, notre 1er critère sera la consommation énergétique qui devra être très faible. Nous allons donc choisir la catégorie "Ultra-low-power".
 
-Dans cette catégorie, 
+Dans cette catégorie, notre objectif va être de choisir un microcontrôleur avec les performances MCU les plus importantes. Pour cela, nous allons regarder 2 indicateurs : le score "CoreMark" qui évalue la puissance de calcul d'un coeur embarqué et la fréquence d'horloge du MCU. 
+
+Notre objectif est de choisir le microcontrôleur avec un MCU qui possède une fréquence d'horloge la plus élevée possible afin que le MCU puisse réaliser les calculs de paramètres du modèle d'IA le plus rapidement possible. Cela va réduire considérablement le temps d'inférence qui est crucial pour l'optimisation de notre modèle d'IA. Egalement, notre objectif va être de choisir le MCU avec un score "CoreMark" le plus élevé possible. En effet, il mesure la capacité du MCU à exécuter du code typique d’un système embarqué, pas seulement la rapidité à laquelle son horloge tourne.
+
+Dans notre cas, nous allons choisir la série de microcontrôleur "STM32U5". En effet, il possède le score "CoreMark" (651) et la fréquence d'horloge (160MHz) les plus élevés de toute la catégorie "Ultra-low-power".
 
 
 
