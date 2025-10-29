@@ -143,7 +143,7 @@ flowchart LR
 
 Egalement, voici les caractéristiques globales de stockage du modèle sur le microcontrôleur :
 
-| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible* |
+| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement - (1 époque)* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible* |
 |-----------|---------|-------|----------------------|----------------------------------------|--------------------------------------|
 | Valeurs | 5.12Mo / 2Mo | 148.56ko / 192ko | 6-7sec | 83.7% | Non-implémentable en l'état |
 
@@ -189,7 +189,7 @@ Egalement, grâce à l'optimisation de la couche "Flatten" par remplacement de l
 
 En réalisant l'analyse de l'importation du nouveau modèle sur CubeAI adapté à notre MCU cible, les résultats montrent toujours que la taille en Flash est trop importante même si elle a diminué et la taille en RAM est correcte même si trop importante. En effet, notre modèle occupe 77.5% de la RAM totale ce qui ne laisse que peu de place à des applications utilisateurs en plus et au fonctionnement du système lui-même.
 
-| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible* |
+| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement - (1 époque)* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible* |
 |-----------|---------|-------|----------------------|----------------------------------------|--------------------------------------|
 | Valeurs | 3.64Mo / 2Mo | 148.71ko / 192ko | 7sec | 83.13% | Non-implémentable en l'état |
 
@@ -227,7 +227,7 @@ On souhaite entrainer ce nouveau modèle afin de le tester pour évaluer l'impac
 
 On remarque que le modèle possède une Accuracy (de 77%) plus basse que le modèle précédent et qu'il n'y a pas d'overfitting, mais, que le modèle est moins efficace sur les données d'entrainement que sur les données de test. Egalement, on a choisit de l'intégrer sur CubeAI afin de vérifier la taille Flash et RAM que ce modèle prendrait sur le MCU cible et voici les résultats obtenus :
 
-| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
+| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement - (1 époque)* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
 |-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
 |  Valeurs  | 425.8Ko / 2Mo | 145.93ko / 192ko | 5-6sec | 77.72% | 71% |
 
@@ -255,7 +255,7 @@ On souhaite maintenant entrainer ce nouveau modèle afin de vérifier que la mod
 
 On remarque que l'Accuracy du modèle a augmenté de 77% à 79% donc, très proche de l'Accuracy initial qui était de 80%. On remarque également qu'il n'y a pas d'overfitting et que le modèle a bien atteint son point optimal d'apprentissage. La méthode de correction par variation du taux de Dropout a donc bien fonctionné.
 
-| Résultats | * MCU Flash* | *MCU RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
+| Résultats | * MCU Flash* | *MCU RAM* | *Temps entrainement - (1 époque)* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
 |-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
 |  Valeurs  | 425.8Ko / 2Mo | 145.93ko / 192ko | 5-6sec | 79.04% | 82% |
 
@@ -317,7 +317,7 @@ Nous n'avons ajouté qu'une seule phase de MaxPooling supplémentaire car, en r�
 
 Nous remarquons l'apprentissage du modèle reste correct et qu'il n'y a pas d'overfitting. Egalement, on remarque que l'on a réussi à augmenter la précision du modèle de 73% à 77% soit 4% de plus. Enfin, nous implémentons ce nouveau modèle sur le MCU cible en utilisant CubeAI et voici les résultats obtenus :
 
-| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
+| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement - (1 époque)* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
 |-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
 |  Valeurs  | 174.25Ko / 2Mo | 146.14ko / 192ko | 5sec | 77.01% | 76% |
 
@@ -349,9 +349,90 @@ Nous réalisons l'entrainement de notre modèle afin de visualiser les effets qu
 
 Notre objectif est alors d'augmenter la précision du modèle. Cependant, ajouter une couche de "MaxPooling" aura pour effet de faire diminuer l'accuracy du modèle par rapport au modèle présent. Nous avons utilisé l'ensemble des éléments structurels du modèle de type VGG pour augmenter la précision du modèle. 
 
-A présent, nous souhaitons nous tourner vers la modification du mode d'entrainement du modèle afin d'augmenter sa précision. Nous allons notamment agir sur un paramètre important de l'entrainement qui est : le Learning Rate.
+A présent, nous souhaitons nous tourner vers la modification du mode d'entrainement du modèle afin d'augmenter sa précision. L’entraînement d’un modèle d'IA consiste à amener ce modèle à apprendre à partir d’un ensemble de données afin qu’il soit capable de faire des prédictions en reconnaîssant des motifs de manière autonome. Ce processus repose sur un principe : le modèle effectue d’abord des prédictions aléatoires, puis compare ces prédictions aux valeurs réelles issues du jeu de données. L’écart entre les deux, appelé erreur ou fonction de perte ou Loss, indique dans quelle mesure le modèle s’est trompé. À partir de cette erreur, un algorithme d’optimisation, souvent basé sur la descente de gradient (rétropropagation du gradient), calcule la direction dans laquelle les paramètres internes du modèle (poids) doivent être ajustés pour réduire cette erreur. Le modèle répète cette opération un grand nombre de fois, en ajustant progressivement ses poids, jusqu’à atteindre un équilibre où les prédictions deviennent les plus précises possibles. Cela constitue l'ensemble du processus de la phase d'entraînement d'un modèle d'IA.
 
-Le Learning Rate est un paramètre numérique qui détermine l’amplitude de la modification des poids d’un modèle à chaque étape de l’entraînement, en fonction du gradient de l’erreur.
+Ainsi, pendant l'entraînement, l'objectif est d'atteindre le minimum global de la Loss. L'ajustement des poids du modèle qu'il réalise pendant l'entrainement se fait par pas. Ce pas est appelé le Learning Rate. Il s'agit d'un paramètre numérique qui détermine l’amplitude de la modification des poids d’un modèle à chaque étape de l’entraînement, en fonction du gradient de la Loss. Il détermine donc la vitesse à laquelle un modèle ajuste ses poids au cours de l’entraînement. Plus précisément, à chaque itération, l’algorithme d’optimisation (rétropropagation du gradient) calcule la direction dans laquelle les poids doivent être modifiés afin de réduire la Loss. Le Learning Rate indique alors de combien ces poids doivent être déplacés dans cette direction.
+
+Si le Learning Rate est trop élevé, les modifications des poids sont trop importantes, ce qui empêche le modèle de se stabiliser : il peut alors diverger, c’est-à-dire que la Loss ne diminue plus ou oscille sans jamais atteindre une valeur minimale. À l’inverse, si le Learning Rate est trop faible, les ajustements des poids deviennent trop faibles, et l’apprentissage progresse très lentement. Dans certains cas, le modèle peut même se bloquer dans un minimum local de la Loss avant d’avoir trouvé les valeurs de poids du minimum global qui minimisent réellement la Loss.
+
+![Schéma explicatif du principe de Learning Rate](images/Schema_LR_corr2.png)
+
+Ainsi, le choix du Learning Rate influence directement la rapidité et la qualité de la convergence du modèle vers un minimum de la Loss. Optimiser et adapter l'entrainement à un modèle d'IA revient donc en partie à optimiser la valeur du Learning Rate afin de trouver le minimum global de la Loss du modèle. Dans le cadre de l'optimisation de notre modèle, nous souhaitons donc modifier la valeur du Learning Rate. Actuellement, tous les modèles précédents ont été entraînés avec un Learning Rate fixe de 0.001. Nous avons réalisé plusieurs tests avec des Learning Rate différent dont 0.01. A cette valeur, l'entraînement était plus rapide et l'accuracy finale un peu plus importante qu'à 0.001. Cependant, l'entraînement était assez instable ce qui avait pour conséquence que l'accuracy finale oscillait beaucoup entre 71% et 78% ce qui n'est pas idéal.
+
+Ainsi, nous avons pu constater qu'un Learning Rate de 0.001 était pratique pour la stabilité de l'entrainement mais provoquait une accuracy finale moins élevée. Un Learning Rate plus important à 0.01 était également pratique pour un meilleur entraînement du modèle et une meilleure accuracy finale mais au prix d'une assez forte instabilité des résultats. Par conséquent, nous avons fait le choix de faire varier le Learning Rate pendant l'entrainement du modèle afin de bénéficier des avantages de chacune des valeurs de Learning Rate. 
+
+Au début, LR = 0.001, puis, LR augmente linéairement jusqu'à 0.01 par pas de 0.002 par époque, et enfin, diminue sur les époques suivantes progressivement jusqu'à un LR de 0.0001. Ainsi, en gardant la même structure du modèle que précédemment, on réalise l'entraînement de notre modèle en faisant varier le Learning Rate comme décrit précédemment. Voici les résultats de l'entrainement :
+
+![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_3-01.png)
+
+On remarque que l’entraînement s’est bien déroulé. Le modèle apprend bien. De plus, on remarque que la précision du modèle a bien augmenté par rapport à l’entraînement sans variation du Learning Rate en augmentant d’environ 3% passant de 74% à 76.7% environ 77%. En effet, ce résultat signifie que le minimum de la Loss trouvé pendant l’entraînement avec un Learning Rate fixe valant 0.001 est un minimum local. En augmentant la valeur du Learning Rate et en la faisant varier pendant le second entraînement, nous avons permis à l’algorithme d’optimisation (rétropropagation du gradient) de trouver un autre minimum à la Loss qui est, pour sa part, plus important. Ainsi, il pourrait s’agir, sans certitude, d’un minimum global. Egalement, la variation du Learning Rate pendant l’entraînement du modèle a permis de stabiliser l’entrainement.   
+
+A présent, nous souhaitons implémenter notre modèle d'IA dans le microcontrôleur cible. Pour cela, nous allons utiliser CubeAi. Voici donc les différents résultats suite à cette implémentation :
+
+| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement - (1 époque)* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
+|-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
+|  Valeurs  | 105.7Ko / 2Mo | 80.14ko / 192ko | 3-4sec | 76.99% | 78% |
+
+![Test du Modèle 3 sur MCU (100ème test)](images/accuracy_mcu_modele3.png)
+
+On remarque immédiatement que les ressources en RAM prises par le modèle d’IA dans le MCU ont considérablement diminué passant de 77.1% de RAM totale du MCU à 41.7% de la RAM totale. De cette manière, cela va permettre à un éventuel utilisateur de pouvoir intégrer une application en parallèle du modèle d’IA. La RAM du MCU ne sera pas saturé. Egalement, les ressources Flash prises par le modèle d’IA dans le MCU ont beaucoup diminué (presque divisés par 2 par rapport au modèle précédent). Enfin, le temps d’entraînement du modèle sur une époque a diminué de 1.5 secondes ce qui est considérable. Toutes ces observations peuvent être expliquées par le fait que l’on a supprimé de nombreux neurones au sein des différentes couches du modèle. De cette manière, nous avons simplifié la structure du réseau de neurones, nous avons diminué le nombre de paramètres à mettre à jour et à retenir, nous avons diminué le nombre de calculs réalisés par le MCU et, par conséquent, nous avons diminué le temps d’entraînement du modèle. Ce modèle est donc plus performant et optimisé que le modèle proposé initialement.
+
+En terme de précision, nous pouvons remarquer que ce modèle a une précision inférieure de 0.02% par rapport au modèle précédent et de 3.15% par rapport au modèle initial. Dans le même temps, les ressources prises par le modèle en Flash et en RAM ont considérablement été diminué. En taille de Flash, celle-ci a presque été divisé par 2 par rapport au modèle précédent et divisé par 47.4 par rapport au modèle initial. En taille RAM, celle-ci a presque été divisé par 2 par rapport au modèle précédent et au modèle initial. Le temps d’entraînement sur une époque a été divisé par 2 par rapport au modèle initial. Ainsi, l’ensemble de l’amélioration de ces paramètres permettent de montrer que les optimisations du modèle sont pertinents malgré la perte de quelques pourcents.
+
+Le modèle actuel que nous proposons correspond au modèle le plus équilibré, stable et optimisé que l’on a réalisé. C’est pourquoi, nous allons utiliser ce modèle pour la suite de nos manipulations et notamment en « Sécurité de l’Intelligence Artificielle ».
+
+Dans l’interface de CubeAI, il y a une section qui nous permet d’activer une compression supplémentaire au modèle importé afin qu’il prenne moins de ressources. Après avoir testé les compressions HIGH et MEDIUM, la compression la plus optimale pour notre modèle est LOW. En effet, lors de la phase de tests, c’est la compression qui permet de réduire encore un peu plus la taille du modèle dans la Flash du MCU sans impacter la taille en RAM et la précision. Voici les résultats obtenus :
+
+| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement - (1 époque)* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
+|-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
+|  Valeurs  | 91.96Ko / 2Mo | 80.14ko / 192ko | 3-4sec | 76.99% | 78% |
+
+![Test du Modèle 3 sur MCU (100ème test)](images/accuracy_mcu_modele3-01.png)
+
+Ainsi, il s'agit du modèle le plus otpimisé que nous avons réalisé.
+
+#### 4.C.2. Changement de la Loss (Modèle 3-1)
+
+Nous souhaitons continuer à supprimer des neurones au modèle précédent afin de diminuer au maximum les ressources mémoires prises par le modèle dans le microcontrôleur. Ainsi, nous divisons par 2 le nombre de neurones sur les 2 dernières couches de convolution et nous adaptons les valeurs de Dropout à l’aide nombreux tests.  
+
+Voici le schéma structurel du nouveau modèle :
+
+```mermaid
+flowchart LR
+    A["Entrée : Image (32x32x3)"] --> B["4 Couches Convolutives    Nb neurones : (16,16,16,16) -       Dropout : (/,0.05,/,0.05)    MaxPooling : (/,1,1,1)"]
+    B --> C["GlobalAveragePooling2D"]
+    C --> D["2 Couches Fully Connected    Nb neurones : (128,10) -  Dropout : (0.06,/)"]
+    D --> E["Sortie : Prédiction"]
+```
+
+On entraîne le nouveau modèle afin de visualiser l'impact qu'a eu la suppression de ces neurones sur les performances du modèle. Pour l'entraînement, nous gardons la variation du Learning Rate précédente et nous ajustons les valeurs de Dropout :
+
+![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_3-1.png)
+
+Nous remarquons que l’entraînement a bien été réalisé. La précision du modèle a beaucoup diminué par rapport au modèle précédent en passant de 76.7% à 71.6%. Cela signifie que l’on supprimé des neurones importants au fonctionnement du réseau de neurones. Notre objectif va donc être de trouver une solution pour améliorer la précision sans impacter les autres paramètres de performance.
+
+En reprenant les derniers résultats d’entraînement du modèle précédent, on peut s’apercevoir d’une particularité. Alors que la Loss de validation est en situation d’overfitting,  l’accuracy de validation, pour sa part, en position supérieure par rapport à l’accuracy d’entraînement. Cela semble assez paradoxal.
+
+Ceci peut s’expliquer par le fait que la Loss prend en compte non seulement si le modèle fait une bonne prédiction, mais aussi le degré de confiance dans cette prédiction. Si le modèle se montre trop sûr de lui sur l’ensemble d’entraînement c’est-à-dire qu’il attribue une probabilité très élevée à certaines classes, même lorsqu’il se trompe, alors la Loss augmente fortement, car une erreur très confiante est sévèrement pénalisée dans une fonction de Loss comme la Cross-Entropy. En revanche, sur l’ensemble de validation, le modèle peut être un peu plus “prudent” et moins confiant dans ses prédictions. Dans ce cas, même s’il fait globalement plus d’erreurs de calibration, il peut avoir une meilleure précision car il se trompe moins souvent sur la classe finale, bien que ses probabilités soient moins bien calibrées, ce qui augmente la Loss.
+
+Dans notre situation, nous utilisons la fonction de Loss nommée « Categorical_CrossEntropy ». Cette Loss mesure l’écart entre la distribution de probabilités prédite par le modèle et la distribution réelle des classes. Elle possède la particularité de sanctionner très sévèrement les erreurs de classification du modèle d’IA lorsque celui-ci y attribue un indice de confiance très élevé. Elle base sa sévérité de sanction sur la confiance qu’un modèle d’IA a sur l’erreur qu’il commet. Cette fonction de Loss considère que chaque étiquette est parfaitement certaine : la classe correcte vaut 1 et toutes les autres 0. Cela pousse le modèle à essayer d’attribuer une probabilité de 1.0 à la classe vraie et 0.0 aux autres, ce qui le rend souvent trop confiant et donc plus susceptible de surapprendre.
+
+Pour faire face à la particularité que l’on a relevé sur le modèle, on va modifier la fonction de Loss en lui rajoutant un paramètre supplémentaire : le Label_Smoothing. Ce paramètre permet de lisser les probabilités au sein du vecteur de labels en passant de [0, 0, 1, 0, 0] à [0.01, 0.01, 0.90, 0.01, 0.01] si ce paramètre vaut 0.1. De cette manière, le modèle n’essaie plus de forcer une certitude absolue, mais apprend une distribution de probabilité plus tolérante. Il devient alors moins confiant sur les prédictions du set d’entraînement, ce qui réduit la tendance à mémoriser les données. Ce paramètre empêche le modèle de devenir trop sûr de lui et l’aide à mieux généraliser sur les données de validation.
+Ainsi, l’introduction de ce nouveau paramètre va nous permettre de résoudre la particularité remarquée. Nous ajoutons donc un Label_Smoothing de 0.1 et réentrainons le modèle afin de visualiser les effets que ce changement va avoir sur son entraînement : 
+
+![Courbes de Loss et d'Accuracy du nouveau modèle](images/Loss_accuracy_courbe_modele_3-1-1.png)
+
+On remarque que l’entraînement est correctement réalisé et que la particularité a bien été corrigé. Egalement, la précision du modèle a bien augmenté de plus d’ 1%. Cela montre bien que le changement de la Loss a bien permis de corriger la particularité de comportement du modèle.
+
+A présent, on souhaite implémenter ce modèle sur le MCU cible. Voici les résultats obtenus :
+
+| Résultats | *MCU Flash* | *MCU RAM* | *Temps entrainement - (1 époque)* | *Précision (Accuracy) sur GPU externe* | *Précision (Accuracy) sur MCU cible - (100 premières images)* |
+|-----------|---------|-------|----------------------|----------------------------------------|-------------------------------------------------------------|
+|  Valeurs  | 61.31Ko / 2Mo | 80.14ko / 192ko | 3-4sec | 72.76% | 72% |
+
+![Test du Modèle 3 sur MCU (100ème test)](images/accuracy_mcu_modele3-1.png)
+
+On remarque que l’on a bien diminué les ressources en Flash prise par le modèle dans le MCU. Cependant, les ressources en RAM n’ont pas diminué ni évolué. Egalement, le temps d’entraînement du modèle sur une époque n’a pas non plus diminué. Ainsi, à la vue de la forte diminution de la précision du modèle, cette optimisation n’est pas pertinante.
 
 ## 5. Sélection d'un nouveau microcontrôleur
 
