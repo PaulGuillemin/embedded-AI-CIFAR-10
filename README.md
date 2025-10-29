@@ -469,7 +469,10 @@ Après avoir sélectionné les configurations de type "STM32U535/545", une class
 
 Comme explicité précédemment, dans un objectif d'optimisation des coûts autour du MCU, nous allons choisir la configuration avec 256Ko de Flash et 274Ko de RAM. Enfin, dans le cadre d'une application industrielle, ce microcontrôleur pourrait être associé à de nombreux capteurs, intégré dans un vaste réseau ou posséder de nombreuses liaisons avec d'autres microcontrôleurs. C'est pourquoi, nous souhaitons choisir le microcontrôleur avec un maximum de pins. Nous choisissons donc le microcontrôleur "STM32U535VC" qui possède 256 Ko de Flash, 274 Ko de RAM et 100 pins. Egalement, en terme de taille, il est quasisment aussi grand que les autres de la même configuration.
 
-Voici le diagramme du type de microcontrôleur choisi :
+Ainsi, pour des raisons, d'application industrielle, d'optimisation des coûts, de performance du MCU, de taille des ressources Flash et RAM disponible, le nouveau microcontrôleur que nous choisissons est le microcontrôleur "STM32U535VCI6".
+
+## 6. Sécurité de l'Intelligence Artificielle
+
 
 
 
