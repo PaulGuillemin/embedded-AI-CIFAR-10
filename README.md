@@ -473,9 +473,36 @@ Ainsi, pour des raisons, d'application industrielle, d'optimisation des coûts, 
 
 ## 6. Sécurité de l'Intelligence Artificielle
 
+### 6.A Pourquoi la sécurité d'un modèle d'IA est important pour l'embarqué
 
+Sur une infrastructure serveur, le modèle bénéficie de mécanismes classiques de protection : contrôle d’accès, chiffrement, sauvegardes et supervision. Sur une carte de type STM32 utilisée en environnement embarqué, la situation est différente. La mémoire Flash qui contient les poids est accessible au microcontrôleur et parfois au port de débogage. Un attaquant disposant d’un accès physique peut ouvrir le boîtier ou réaliser une injection de faute sur le microcontrôleur en agissant sur la tension ou l’horloge.
+Dans un contexte embarqué, le modèle est en compressé ou quantifié, ce qui fait qu’un seul bit peut porter une part significative d’information. Le réseau est de petite taille, car il a été optimisé pour la cible. La conséquence est qu’une attaque consistant à juste modifier quelques bits dans les poids peut suffire à provoquer une chute marquée de l’accuracy.
 
+### 6.B Modèle de menace retenu
 
+Le projet retient un scénario réaliste. On considère d’abord qu’un attaquant peut avoir un accès local au binaire ou à la carte. On considère ensuite qu’il ne cherche pas à réentraîner un modèle complet pour le remplacer, mais qu’il veut uniquement détériorer celui qui a été déployé. Enfin, on suppose qu’il est en mesure de modifier un petit nombre de valeurs en mémoire, par exemple à la faveur d’une mise à jour insuffisamment protégée, d’une corruption mémoire ou d’une attaque physique.
 
+### 6.C Attaque réalisée : bit-flips sur les poids
 
+L’attaque a été simulée sur le modèle entraîné en local, qui a ensuite servi à la partie embarquée. Avant toute corruption, les courbes d’entraînement montrent que le modèle atteint un niveau d’accuracy conforme aux attentes, compris entre 72 % et 75 %. 
+L’attaque suit le principe suivant : le modèle entraîné est chargé, un nombre donné de poids est sélectionné (1, 3, 5, jusqu’à 30), un seul bit est inversé dans la représentation de chacun de ces poids, puis le modèle est réévalué sur le jeu de test afin de mesurer l’accuracy après corruption. Le résultat met en évidence une dégradation rapide des performances en fonction du nombre de bit-flips appliqués.
+
+![curve.png]
+
+![accuracy_vs_bfa.png]
+
+Sans bit-flip, le modèle fonctionne de manière nominale et atteint environ 72 % d’accuracy. Avec seulement trois à cinq bit-flips, l’accuracy descend déjà en dessous de 40 %. Aux alentours de dix à douze bit-flips, elle se situe autour de 15 %. Au-delà de vingt-cinq à trente bit-flips, le comportement du modèle devient proche d’un choix aléatoire, autour de 10 % pour une tâche à dix classes. 
+Cela montre que la modification de quelques dizaines de bits suffit à rendre le modèle pratiquement inutilisable. Dans un microcontrôleur dépourvu de correction d’erreurs mémoire et de mécanisme de vérification d’intégrité du modèle, ce scénario reste plausible. On peut donc conclure que le modèle est fonctionnel tant qu’il est intact, mais qu’il n’est pas durci et qu’il reste vulnérable à des modifications malveillantes de la mémoire contenant les poids.
+
+### 6.D Implémentations de protections
+
+Plusieurs mesures connues permettent de limiter ce type d’attaque ou au moins de le détecter. Une première famille de solutions repose sur le contrôle d’intégrité des poids au démarrage : calcul d’un hash ou d’un CRC de la zone mémoire contenant le modèle, stockage signé du modèle et vérification de cette signature avant utilisation, puis rechargement d’une copie saine en cas d’échec de la vérification. 
+Une deuxième approche consiste à rendre le réseau tolérant aux fautes en l’entraînant avec des corruptions injectées de manière aléatoire sur les poids pendant l’apprentissage ; cette méthode améliore la robustesse mais augmente fortement la durée et le coût d’entraînement. 
+Une troisième option vise à introduire une redondance légère, par exemple en dupliquant uniquement la dernière couche ou le classifieur pour effectuer un vote, ou en conservant une version de secours du modèle dans une zone mémoire distincte. 
+Enfin, il est possible de durcir la plateforme en activant les protections mémoire du microcontrôleur, en restreignant l’accès au port de débogage et en limitant les écritures sur la zone où sont stockés les poids.
+
+### 6.E Limitation du projet
+
+La mise en application complète de ces protections n’a pas été réalisée dans le cadre de ce projet. L’entraînement avec fautes, l’ajout d’une vérification d’intégrité dans le code STM32 ou la duplication de couches n’ont pas été implémentés. 
+Le facteur limitant a principalement été le temps d’entraînement en local, déjà élevé pour aboutir à un modèle de base satisfaisant. Multiplier les entraînements pour intégrer le durcissement aurait dépassé le temps disponible. Le travail effectué a donc consisté à démontrer qu’un bit-flip ciblé dégrade fortement l’accuracy, à relier cette vulnérabilité au contexte de l’IA embarquéee, et à proposer les contre-mesures les mieux adaptées. Les suites logiques sont les suivantes : intégrer au moins un contrôle d’intégrité dans le code embarqué, valider expérimentalement un entraînement sur une version réduite du réseau, puis comparer les courbes d’accuracy avant et après mise en place d’une défense.
 
