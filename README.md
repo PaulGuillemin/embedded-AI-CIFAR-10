@@ -17,9 +17,7 @@
 3. [Évaluation de l’embarquabilité du modèle initial](#3-évaluation-de-lembarquabilité-du-modèle-initial)
 4. [Conception et implémentation de nouveaux modèles plus optimisés](#4-conception-et-implementation-de-nouveaux-modelès-plus-optimisés)
 5. [Sélection d’un nouveau microcontrôleur](#5-sélection-dun-nouveau-microcontrôleur)
-6. [Arborescence du dépôt](#arborescence-du-dépôt)
-7. [Reproduire les résultats](#reproduire-les-résultats)
-8. [Limites & pistes](#limites--pistes)
+6. [Sécurité de l'Intelligence Artificielle](#Sécurité-de-l-intelligence-artificielle)
 
 ## 1. Analyse du modèle existant
 
