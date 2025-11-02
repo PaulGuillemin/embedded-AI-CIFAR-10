@@ -489,10 +489,16 @@ L’attaque suit le principe suivant : le modèle entraîné est chargé, un nom
 
 ![Courbe d'apprentissage du modèle en local](images/curve.png)
 
-![Chute de l'accuracy face au bitflip](images/accuracy_vs_bfa.png)
+### 6.C.1 Principe de la BFA
+
+Un bitflip est une modification d’un seul bit dans la représentation binaire d’un poids du réseau. Comme les poids d’un modèle embarqué sont souvent quantifiés sur 8 bits (ou stockés en flottant sur 32 bits), tous les bits n’ont pas la même importance: changer un bit de signe ou un bit de poids fort peut faire passer une petite valeur positive à une valeur très négative, ou changer l’ordre de grandeur de la valeur. L’attaque Bit-Flip Attack (BFA) consiste à choisir le poids le plus sensible (celui dont une petite variation augmente le plus la perte), puis à tester virtuellement l’inversion de chacun de ses bits pour garder celui qui dégrade le plus le modèle. On applique ensuite réellement ce bitflip dans la mémoire du modèle et on recommence tant qu’on n’a pas atteint le nombre de fautes voulu. Comme le réseau embarqué est petit et quantifié, quelques inversions suffisent pour propager l’erreur dans les couches suivantes et faire chuter rapidement l’accuracy.
+
+### 6.C.2 Conséquences de la BFA
 
 Sans bit-flip, le modèle fonctionne de manière nominale et atteint environ 72 % d’accuracy. Avec seulement trois à cinq bit-flips, l’accuracy descend déjà en dessous de 40 %. Aux alentours de dix à douze bit-flips, elle se situe autour de 15 %. Au-delà de vingt-cinq à trente bit-flips, le comportement du modèle devient proche d’un choix aléatoire, autour de 10 % pour une tâche à dix classes. 
 Cela montre que la modification de quelques dizaines de bits suffit à rendre le modèle pratiquement inutilisable. Dans un microcontrôleur dépourvu de correction d’erreurs mémoire et de mécanisme de vérification d’intégrité du modèle, ce scénario reste plausible. On peut donc conclure que le modèle est fonctionnel tant qu’il est intact, mais qu’il n’est pas durci et qu’il reste vulnérable à des modifications malveillantes de la mémoire contenant les poids.
+
+![Chute de l'accuracy face au bitflip](images/accuracy_vs_bfa.png)
 
 ### 6.D Implémentations de protections
 
