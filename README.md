@@ -487,9 +487,9 @@ Le projet retient un scénario réaliste. On considère d’abord qu’un attaqu
 L’attaque a été simulée sur le modèle entraîné en local, qui a ensuite servi à la partie embarquée. Avant toute corruption, les courbes d’entraînement montrent que le modèle atteint un niveau d’accuracy conforme aux attentes, compris entre 72 % et 75 %. 
 L’attaque suit le principe suivant : le modèle entraîné est chargé, un nombre donné de poids est sélectionné (1, 3, 5, jusqu’à 30), un seul bit est inversé dans la représentation de chacun de ces poids, puis le modèle est réévalué sur le jeu de test afin de mesurer l’accuracy après corruption. Le résultat met en évidence une dégradation rapide des performances en fonction du nombre de bit-flips appliqués.
 
-![curve.png]
+![Courbe d'apprentissage du modèle en local](images/curve.png)
 
-![accuracy_vs_bfa.png]
+![Chute de l'accuracy face au bitflip](accuracy_vs_bfa.png)
 
 Sans bit-flip, le modèle fonctionne de manière nominale et atteint environ 72 % d’accuracy. Avec seulement trois à cinq bit-flips, l’accuracy descend déjà en dessous de 40 %. Aux alentours de dix à douze bit-flips, elle se situe autour de 15 %. Au-delà de vingt-cinq à trente bit-flips, le comportement du modèle devient proche d’un choix aléatoire, autour de 10 % pour une tâche à dix classes. 
 Cela montre que la modification de quelques dizaines de bits suffit à rendre le modèle pratiquement inutilisable. Dans un microcontrôleur dépourvu de correction d’erreurs mémoire et de mécanisme de vérification d’intégrité du modèle, ce scénario reste plausible. On peut donc conclure que le modèle est fonctionnel tant qu’il est intact, mais qu’il n’est pas durci et qu’il reste vulnérable à des modifications malveillantes de la mémoire contenant les poids.
